@@ -38,17 +38,43 @@ local KV_NASCEU = "nasceu"
 -- personagens (player_storage); sem ela o EK recebe espada e escudo.
 Hegemony.STORAGE_EK_AVENGER = 98700
 
--- Suprimentos: cargas e quantidades nao descem (entrypoint.sh), entao 1 basta.
-local RUNAS = {
+-- Comida infinita: o brown mushroom do kit leva este action id, e o motor
+-- procura a acao pelo action id antes da do item (Actions::getAction). Assim
+-- o foods.lua do Canary segue valendo para qualquer outra comida, e este come
+-- igual a ele (22 x 12 s de regeneracao, "You are full." no mesmo limite) sem
+-- gastar o cogumelo.
+Hegemony.AID_COMIDA_INFINITA = 64701
+local COMIDA_SEGUNDOS = 22 * 12
+
+local comer = Action()
+function comer.onUse(player, item, fromPosition, target, toPosition, isHotkey)
+	local regeneracao = player:getCondition(CONDITION_REGENERATION, CONDITIONID_DEFAULT)
+	if regeneracao and math.floor(regeneracao:getTicks() / 1000 + COMIDA_SEGUNDOS) >= 1200 then
+		player:sendTextMessage(MESSAGE_FAILURE, "You are full.")
+		return true
+	end
+	player:updateFood(item:getId(), COMIDA_SEGUNDOS)
+	player:feed(COMIDA_SEGUNDOS)
+	player:say("Munch.", TALKTYPE_MONSTER_SAY)
+	player:getPosition():sendSingleSoundEffect(SOUND_EFFECT_TYPE_ACTION_EAT, player:isInGhostMode() and nil or player)
+	return true
+end
+comer:aid(Hegemony.AID_COMIDA_INFINITA)
+comer:register()
+
+-- Suprimentos de todas as vocacoes: cargas e quantidades nao descem
+-- (entrypoint.sh; o cogumelo, pela acao acima), entao 1 basta.
+local BASICOS = {
 	{ 3180, 3 }, -- magic wall
 	{ 3197, 3 }, -- disintegrate
 	{ 3148, 3 }, -- destroy field
 	{ 3192, 2 }, -- fire bomb
+	{ 3725, 1, aid = Hegemony.AID_COMIDA_INFINITA }, -- brown mushroom
 }
 
-local function comRunas(extra)
+local function comBasicos(extra)
 	local lista = {}
-	for _, r in ipairs(RUNAS) do
+	for _, r in ipairs(BASICOS) do
 		lista[#lista + 1] = r
 	end
 	for _, r in ipairs(extra) do
@@ -72,7 +98,7 @@ local MOLDES = {
 			[CONST_SLOT_RIGHT] = 8075, -- spellbook of lost souls (nivel 60, a maior defesa ate o 80)
 			[CONST_SLOT_FEET] = 3079, -- boots of haste
 		},
-		mochila = comRunas({ { 3155, 3 }, { 238, 1 }, { 266, 1 } }), -- sudden death, great mana, health potion
+		mochila = comBasicos({ { 3155, 3 }, { 238, 1 }, { 266, 1 } }), -- sudden death, great mana, health potion
 	},
 	[6] = { -- Elder Druid
 		vida = 545, mana = 2250, cap = 1190, ml = 50,
@@ -86,7 +112,7 @@ local MOLDES = {
 			[CONST_SLOT_FEET] = 3079,
 		},
 		-- paralyse rune e so de druida (data/scripts/runes/paralyze_rune.lua)
-		mochila = comRunas({ { 3155, 3 }, { 3165, 1 }, { 3156, 2 }, { 238, 1 }, { 266, 1 } }), -- sudden death, paralyse, wild growth, pocoes
+		mochila = comBasicos({ { 3155, 3 }, { 3165, 1 }, { 3156, 2 }, { 238, 1 }, { 266, 1 } }), -- sudden death, paralyse, wild growth, pocoes
 	},
 	[7] = { -- Royal Paladin: a Ironworker e de duas maos
 		vida = 905, mana = 1170, cap = 1910, ml = 22,
@@ -103,7 +129,7 @@ local MOLDES = {
 		-- nem e consultado, e a drill bolt nem entra nele. A aljava pode ir com
 		-- arma de distancia de duas maos.
 		aljava = { 35562, 16142, 100 }, -- quiver com drill bolts (nivel 70), infinitas
-		mochila = comRunas({ { 7642, 1 }, { 238, 1 } }), -- great spirit, great mana
+		mochila = comBasicos({ { 7642, 1 }, { 238, 1 } }), -- great spirit, great mana
 	},
 	[8] = { -- Elite Knight: melee 95 nas tres armas
 		vida = 1265, mana = 450, cap = 2270, ml = 10,
@@ -121,7 +147,7 @@ local MOLDES = {
 			[CONST_SLOT_LEFT] = 6527, -- the avenger (nivel 75)
 			[CONST_SLOT_RIGHT] = false,
 		},
-		mochila = comRunas({ { 239, 1 }, { 237, 1 } }), -- great health, strong mana
+		mochila = comBasicos({ { 239, 1 }, { 237, 1 } }), -- great health, strong mana
 	},
 }
 
@@ -159,6 +185,20 @@ local function slotsDoKit(player, m)
 	return slots
 end
 
+-- Item com action id nasce com ele, antes de entrar na mochila: se fosse
+-- posto depois, podia cair numa pilha comum do mesmo item.
+local function porNaMochila(mochila, e)
+	if not e.aid then
+		mochila:addItem(e[1], e[2])
+		return
+	end
+	local item = Game.createItem(e[1], e[2])
+	if item then
+		item:setActionId(e.aid)
+		mochila:addItemEx(item)
+	end
+end
+
 local function darKit(player, m)
 	for slot = CONST_SLOT_HEAD, CONST_SLOT_AMMO do
 		local item = player:getSlotItem(slot)
@@ -180,7 +220,7 @@ local function darKit(player, m)
 	local mochila = player:addItem(2854, 1, false, 1, CONST_SLOT_BACKPACK)
 	if mochila then
 		for _, e in ipairs(m.mochila) do
-			mochila:addItem(e[1], e[2])
+			porNaMochila(mochila, e)
 		end
 	end
 end
@@ -216,7 +256,7 @@ local function completarSuprimentos(player, m)
 	end
 	for _, e in ipairs(m.mochila) do
 		if player:getItemCount(e[1]) == 0 then
-			mochila:addItem(e[1], e[2])
+			porNaMochila(mochila, e)
 		end
 	end
 end

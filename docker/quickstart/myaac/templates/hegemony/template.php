@@ -161,7 +161,7 @@ function hegemony_link_personagem(string $nome): string {
 									<li><strong>Matar</strong>Dá experiência. Quem mata fica 15 min marcado: sem logout e sem área protegida.</li>
 									<li><strong>Morrer</strong>Tudo cai no corpo e você volta ao 80 com kit novo.</li>
 									<li><strong>Sair do jogo</strong>Nível e skills voltam ao 80. Os itens ficam.</li>
-									<li><strong>Suprimentos</strong>Runas, poções e munição infinitas.</li>
+									<li><strong>Suprimentos</strong>Runas, poções, munição e comida infinitas.</li>
 									<li><strong>Varg, o receptador</strong>Compra o equipamento que você saquear e vende Stone Skin e Might Ring por 10.000.</li>
 								</ul>
 							</div>

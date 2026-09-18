@@ -41,7 +41,7 @@ INSERT INTO `myaac_news` (`title`, `body`, `type`, `date`, `category`, `player_i
 <ul>
 <li>Sua conta é premium e já vem com <b>cinco personagens nível 80</b>: Master Sorcerer, Elder Druid, Royal Paladin e dois Elite Knights, um com Magic Sword e escudo, outro com a Avenger.</li>
 <li>Cada um nasce com o kit da vocação e com <b>todas as magias</b> liberadas (cada uma respeita o nível mínimo dela).</li>
-<li>Runas, poções e munição são <b>infinitas</b>.</li>
+<li>Runas, poções, munição e comida são <b>infinitas</b>.</li>
 </ul>
 <h3>Matar e morrer</h3>
 <ul>
@@ -87,7 +87,7 @@ UPDATE `myaac_pages` SET `title` = 'Regras', `enable_tinymce` = 0, `body` =
 <ul>
 <li>A conta nasce premium, com cinco personagens nível 80: Master Sorcerer, Elder Druid, Royal Paladin e dois Elite Knights (espada e escudo, ou Avenger).</li>
 <li>Todas as magias da vocação vêm liberadas, cada uma no nível mínimo dela.</li>
-<li>Runas, poções e munição são infinitas.</li>
+<li>Runas, poções, munição e comida são infinitas.</li>
 </ul>
 <h3>Kits</h3>
 <table>
@@ -98,7 +98,7 @@ UPDATE `myaac_pages` SET `title` = 'Regras', `enable_tinymce` = 0, `body` =
 <tr><td>Elite Knight (escudo)</td><td>Zaoan Helmet, Zaoan Armor, Zaoan Legs, Magic Sword, Shield of Corruption, Boots of Haste</td></tr>
 <tr><td>Elite Knight (Avenger)</td><td>Zaoan Helmet, Zaoan Armor, Zaoan Legs, The Avenger, Boots of Haste</td></tr>
 </table>
-<p>Na mochila, infinitas: Magic Wall, Disintegrate, Destroy Field e Fire Bomb para todos; Sudden Death para os magos; Paralyse e Wild Growth para o Elder Druid; e as poções da vocação.</p>
+<p>Na mochila, infinitas: Magic Wall, Disintegrate, Destroy Field e Fire Bomb para todos; Sudden Death para os magos; Paralyse e Wild Growth para o Elder Druid; e as poções da vocação. Todo mundo leva também um Brown Mushroom que nunca acaba.</p>
 <h3>Matar, morrer e sair</h3>
 <ul>
 <li>Matar outro jogador dá experiência.</li>
