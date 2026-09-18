@@ -21,6 +21,7 @@ modulos extras e um servidores_extras.lua, que o init.lua le se existir.
 """
 import argparse
 import re
+import struct
 import zipfile
 from datetime import date
 from pathlib import Path
@@ -32,6 +33,12 @@ VERSAO = "1525"
 # Dentro de data/, estas pastas tem uma subpasta por versao do cliente; so a
 # nossa vai.
 POR_VERSAO = {"things", "sounds"}
+
+# Ferramentas de quem desenvolve, nao de quem joga: cada uma poe um botao na
+# barra de cima (Terminal, Debug Info, Editor de OTUI) ou e so exemplo. Ficam
+# no cliente de desenvolvimento; no pacote nao vao, e saem tambem da lista
+# load-later do modulo client, para o log do jogador nao acusar modulo sumido.
+MODULOS_DE_DEV = {"client_terminal", "client_debug_info", "dev_otui", "game_htmlsample"}
 
 LEIA_ME = """Hegemony - cliente
 ==================
@@ -55,7 +62,7 @@ def arquivos_do_pacote(mods):
     for nome in ("init.lua", "config.otml"):
         yield RAIZ / nome, nome
     for caminho in sorted((RAIZ / "modules").rglob("*")):
-        if caminho.is_file():
+        if caminho.is_file() and caminho.relative_to(RAIZ / "modules").parts[0] not in MODULOS_DE_DEV:
             yield caminho, caminho.relative_to(RAIZ).as_posix()
     data = RAIZ / "data"
     for caminho in sorted(data.rglob("*")):
@@ -69,6 +76,25 @@ def arquivos_do_pacote(mods):
         for caminho in sorted(mods.rglob("*")):
             if caminho.is_file():
                 yield caminho, "mods/" + caminho.relative_to(mods).as_posix()
+
+
+def sem_console(exe):
+    # O exe dos jogadores nao pode abrir janela de cmd. O preset windows-release
+    # compila RelWithDebInfo, que ate 18/09 linkava como CONSOLE (subsystem 3).
+    # Trocar o campo para WINDOWS (2) e o que o editbin /SUBSYSTEM:WINDOWS faz;
+    # o ponto de entrada ja e mainCRTStartup, que serve aos dois.
+    dados = bytearray(exe.read_bytes())
+    campo = struct.unpack_from("<I", dados, 0x3C)[0] + 24 + 68
+    if struct.unpack_from("<H", dados, campo)[0] == 3:
+        struct.pack_into("<H", dados, campo, 2)
+        print("aviso: otclient.exe era de console; a copia do pacote foi marcada como janela")
+    return bytes(dados)
+
+
+def sem_modulos_de_dev(texto):
+    linhas = [l for l in texto.splitlines(keepends=True)
+              if l.strip().removeprefix("- ") not in MODULOS_DE_DEV]
+    return "".join(linhas)
 
 
 def com_endereco(caminho, texto, endereco):
@@ -108,6 +134,10 @@ def main():
             if nome in ("init.lua", "config.otml"):  # os da raiz; mods/ nao passa aqui
                 texto = origem.read_text(encoding="utf-8")
                 z.writestr(alvo, com_endereco(origem, texto, args.endereco))
+            elif nome == "Hegemony.exe":
+                z.writestr(alvo, sem_console(origem))
+            elif nome == "modules/client/client.otmod":
+                z.writestr(alvo, sem_modulos_de_dev(origem.read_text(encoding="utf-8")))
             else:
                 # Sprites e sons ja vem comprimidos (lzma/ogg): comprimir de
                 # novo so gasta tempo.
