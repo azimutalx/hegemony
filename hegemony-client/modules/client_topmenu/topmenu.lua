@@ -121,7 +121,7 @@ function init()
       }
     })
     if Services.websites and not managerAccountsButton then
-        managerAccountsButton = modules.client_topmenu.addTopRightRegularButton('hotkeysButton', tr('Manage Account'),
+        managerAccountsButton = modules.client_topmenu.addTopRightRegularButton('hotkeysButton', tr('Site'),
             nil, openManagerAccounts)
     end
     if g_platform.isMobile() then
@@ -488,8 +488,12 @@ function toggle()
     end
 end
 
+-- Abre o site do servidor escolhido na tela de login (cada um tem o seu);
+-- Services.websites fica so de reserva.
 function openManagerAccounts()
-    if Services.websites then
+    if EnterGame and EnterGame.openSite then
+        EnterGame.openSite('')
+    elseif Services.websites then
         g_platform.openUrl(Services.websites)
     end
 
@@ -519,10 +523,10 @@ function extendedView(extendedView)
         topMenu:addAnchor(AnchorHorizontalCenter, 'parent', AnchorHorizontalCenter)
         modules.game_interface.getRootPanel():addAnchor(AnchorTop, 'parent', AnchorTop)
         topMenu:setWidth(1020)
-        topMenu.topLeftDiscord:setWidth(110)
-        topMenu.topLeftYoutube:setWidth(100)
-        topMenu.topLeftOnlinePlayers:show()
-        topMenu.topLeftDiscord:show()
-        topMenu.topLeftYoutube:show()
+        -- Discord, YouTube e "players online" vinham de scraping do site do
+        -- upstream, que esta desligado: so mostravam "-". Ficam escondidos.
+        topMenu.topLeftOnlinePlayers:hide()
+        topMenu.topLeftDiscord:hide()
+        topMenu.topLeftYoutube:hide()
     end
 end

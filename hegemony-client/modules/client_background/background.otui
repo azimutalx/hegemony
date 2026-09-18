@@ -1,3 +1,7 @@
+// Sem veus de tela cheia. Os dois que existiam aqui (#0b0e14c0 a 88% e
+// #00000055) quase apagavam a arte — e nem se notava, porque o fundo era um
+// JPEG com extensao .png que o cliente nao carregava. O escurecimento que o
+// login precisa agora vem embutido no proprio PNG (tools/gerar_tema.py).
 Panel
   id: background
   image-source: /client_background/background
@@ -8,31 +12,17 @@ Panel
   anchors.bottom: parent.bottom
   focusable: false
 
-  UIWidget
-    id: blurOverlay
-    anchors.fill: parent
-    background-color: #0b0e14c0
-    opacity: 0.88
-    focusable: false
-
-  UIWidget
-    id: glassVignette
-    anchors.fill: parent
-    background-color: #00000055
-    focusable: false
-
   UILabel
     id: clientVersionLabel
-    background-color: #1e2325dd
-    border: 1 #0984e366
-    anchors.right: parent.right
+    image-source: /images/ui/hegemony/window_headless
+    image-border: 6
+    anchors.left: parent.left
     anchors.bottom: parent.bottom
     text-align: center
     text-auto-resize: true
-    width: 240
-    padding: 6
-    margin-right: 12
-    margin-bottom: 12
-    color: #dfe6e9
+    padding: 7 12 7 12
+    margin-left: 14
+    margin-bottom: 14
+    color: #d6aa5c
     font: verdana-11px-monochrome
-    !text: 'Hegemony PvP - Tactical War MMORPG'
+    !text: 'Hegemony'

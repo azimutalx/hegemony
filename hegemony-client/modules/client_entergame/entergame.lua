@@ -19,8 +19,39 @@ local motdEnabled = true
 local tokenWindow
 local authErrorBox
 local hasAttemptedAuthenticator = false
+local serverBox
+-- Cada tentativa de login ganha um numero novo. A resposta HTTP chega numa
+-- thread separada: se o jogador cancelou e tentou de novo (ou trocou de
+-- servidor), a resposta antiga ainda chega depois e nao pode abrir a lista
+-- de personagens do servidor errado. O upstream usava math.random(1), que
+-- devolve sempre 1 e anulava a checagem.
+local loginRequestCounter = 0
 
 -- private functions
+local function serverByLogin(login)
+    for _, server in ipairs(Hegemony_Servers or {}) do
+        if server.login == login then
+            return server
+        end
+    end
+end
+
+local function currentServer()
+    local option = serverBox and serverBox:getCurrentOption()
+    return (option and option.data) or (Hegemony_Servers and Hegemony_Servers[1])
+end
+
+-- "http://127.0.0.1:8088/login" -> "127.0.0.1", 8088, "/login"
+local function splitLoginUrl(url)
+    local host, port, path = url:match('^https?://([^/:]+):?(%d*)(.*)$')
+    if not host then
+        return '127.0.0.1', 80, '/login'
+    end
+    if path == '' then
+        path = '/'
+    end
+    return host, tonumber(port) or 80, path
+end
 local function onError(protocol, message, errorCode)
     if loadBox then
         loadBox:destroy()
@@ -144,15 +175,10 @@ local function onUpdateNeeded(protocol, signature)
     end
 end
 
+-- O cliente so fala o protocolo 1525, que entra por email; os textos ficam no
+-- otui e aqui so se reafirma o titulo.
 local function updateLabelText()
-    enterGame:setText("Hegemony PvP - Entrar")
-    if enterGame:getChildById('clientComboBox') and tonumber(enterGame:getChildById('clientComboBox'):getText()) > 1080 then
-        enterGame:getChildById('emailLabel'):setText("Email:")
-        enterGame:getChildById('rememberEmailBox'):setText("Lembrar Email:")
-    else
-        enterGame:getChildById('emailLabel'):setText("Conta:")
-        enterGame:getChildById('rememberEmailBox'):setText("Lembrar Senha:")
-    end
+    enterGame:setText('Hegemony')
 end
 
 local function loadServerListModule()
@@ -174,41 +200,23 @@ function EnterGame.init()
       }
     })
 
-    local host = g_settings.get('host')
-    if not host or #host == 0 then
-        host = '127.0.0.1'
-    end
-    local port = g_settings.get('port')
     local stayLogged = g_settings.getBoolean('staylogged')
-    local autologin = g_settings.getBoolean('autologin')
-    local httpLogin = g_settings.getBoolean('httpLogin')
-    local clientVersion = g_settings.getInteger('client-version')
+    local clientVersion = 1525
 
-    if not clientVersion or clientVersion == 0 then
-        clientVersion = 1525
-    end
-
-    if not port or port == 0 then
-        port = 7171
-    end
-
-    local servers = g_settings.getNode("ServerList") or {}
-    local serverData = servers[host] or {}
-    if serverData and serverData.account then
-        EnterGame.setAccountName(serverData.account)
-        EnterGame.setPassword(serverData.password)
-        enterGame:getChildById('rememberEmailBox'):setChecked(true)
-    else
-        EnterGame.setAccountName('')
-        EnterGame.setPassword('')
-        enterGame:getChildById('rememberEmailBox'):setChecked(false)
-    end
-    
-    enterGame:getChildById('autoLoginBox'):setChecked(serverData.autologin == true)
-    enterGame:getChildById('serverHostTextEdit'):setText(host)
-    enterGame:getChildById('serverPortTextEdit'):setText(port)
     enterGame:getChildById('stayLoggedBox'):setChecked(stayLogged)
-    enterGame:getChildById('httpLoginBox'):setChecked(httpLogin)
+    enterGame:getChildById('httpLoginBox'):setChecked(true)
+
+    -- A lista vem de Hegemony_Servers (init.lua). 'host' guarda a URL de
+    -- login do ultimo servidor usado, e e por ela que ServerList guarda a
+    -- conta de cada um.
+    serverBox = enterGame:getChildById('serverComboBox')
+    for _, server in ipairs(Hegemony_Servers or {}) do
+        serverBox:addOption(server.name, server)
+    end
+    local lastServer = serverByLogin(g_settings.get('host'))
+    if lastServer then
+        serverBox:setCurrentOptionByData(lastServer, true)
+    end
 
     local installedClients = {}
     if modules.client_assets and modules.client_assets.getInstalledClientVersions then
@@ -271,7 +279,11 @@ function EnterGame.init()
         end
     })
 
-    EnterGame.setUniqueServer('127.0.0.1', 7171, 1525)
+    EnterGame.setUniqueServer(nil, nil, clientVersion)
+    EnterGame.selectServer(currentServer())
+    connect(serverBox, {
+        onOptionChange = EnterGame.onServerChange
+    })
     updateLabelText()
 
     enterGame:hide()
@@ -345,6 +357,12 @@ function EnterGame.terminate()
     disconnect(clientBox, {
         onOptionChange = EnterGame.onClientVersionChange
     })
+    if serverBox then
+        disconnect(serverBox, {
+            onOptionChange = EnterGame.onServerChange
+        })
+        serverBox = nil
+    end
     disconnect(g_game, {
         onGameStart = EnterGame.hidePanels
     })
@@ -486,8 +504,55 @@ function EnterGame.onClientVersionChange(comboBox, text, data)
     updateLabelText()
 end
 
+-- Troca o servidor ativo: a conta lembrada, o texto de apoio e o G.host que
+-- o resto do cliente usa como chave (hotkeys, ServerList) passam a ser dele.
+function EnterGame.selectServer(server)
+    if not server then
+        return
+    end
+
+    G.server = server
+    G.host = server.login
+    -- Antes de mexer nos campos de conta: o onCheckChange do "lembrar" grava
+    -- no host que estiver neste campo, e com o host antigo ali a troca de
+    -- servidor apagaria a conta salva do servidor anterior.
+    enterGame:getChildById('serverHostTextEdit'):setText(server.login)
+    enterGame:getChildById('serverPortTextEdit'):setText(tostring(server.loginPort))
+    enterGame:getChildById('serverDescriptionLabel'):setText(server.description or '')
+
+    local servers = g_settings.getNode('ServerList') or {}
+    local serverData = servers[server.login] or {}
+    -- Senha antes da conta: setAccountName marca o "lembrar", e o handler
+    -- dele salva o que estiver no campo de senha naquele instante.
+    EnterGame.setPassword(serverData.password)
+    EnterGame.setAccountName(serverData.account)
+    enterGame:getChildById('autoLoginBox'):setChecked(serverData.autologin == true)
+    EnterGame.setLoginWebService(server.login)
+end
+
+function EnterGame.onServerChange(comboBox, text, server)
+    EnterGame.selectServer(server)
+    g_settings.set('host', server and server.login or '')
+    local accountEdit = enterGame:getChildById('accountNameTextEdit')
+    if #accountEdit:getText() == 0 then
+        accountEdit:focus()
+    else
+        enterGame:getChildById('accountPasswordTextEdit'):focus()
+    end
+end
+
+function EnterGame.openSite(path)
+    local server = currentServer()
+    if server and server.site then
+        g_platform.openUrl(server.site .. (path or ''))
+    end
+end
+
 function EnterGame.setLoginWebService(url)
-    url = url or 'http://127.0.0.1:8088/login'
+    url = url or (currentServer() or {}).login
+    if not url then
+        return
+    end
     url = url:gsub("https://", "http://")
     G.host = url
     if Services then
@@ -501,7 +566,8 @@ function EnterGame.setLoginWebService(url)
 end
 
 function EnterGame.tryHttpLogin(clientVersion, httpLogin)
-    EnterGame.setLoginWebService('http://127.0.0.1:8088/login')
+    local server = G.server or currentServer()
+    EnterGame.setLoginWebService(server.login)
     g_game.setClientVersion(clientVersion)
     g_game.setProtocolVersion(g_game.getClientProtocolVersion(clientVersion))
     g_game.chooseRsa(G.host)
@@ -528,8 +594,8 @@ function EnterGame.tryHttpLogin(clientVersion, httpLogin)
         end
     })
 
-    local host, path = "127.0.0.1", "/login"
-    G.port = 8088
+    local host, port, path = splitLoginUrl(server.login)
+    G.port = port
 
     if g_http then
         if g_http.setVerifyPeer then pcall(g_http.setVerifyPeer, false) end
@@ -540,11 +606,14 @@ function EnterGame.tryHttpLogin(clientVersion, httpLogin)
         if HTTP.setVerifyHost then pcall(HTTP.setVerifyHost, false) end
     end
 
-    math.randomseed(os.time())
-    G.requestId = math.random(1)
+    loginRequestCounter = loginRequestCounter + 1
+    G.requestId = loginRequestCounter
 
+    -- httpLogin = true vai direto no http://. Com false o cliente tenta HTTPS
+    -- primeiro, falha (o login-server local nao tem TLS) e so entao cai no
+    -- HTTP, deixando um erro de SSL no log a cada login.
     local http = LoginHttp.create()
-    http:httpLogin(host, path, G.port, G.account, G.password, G.requestId, false, G.authenticatorToken)
+    http:httpLogin(host, path, port, G.account, G.password, G.requestId, true, G.authenticatorToken)
 end
 
 function printTable(t)
@@ -560,6 +629,10 @@ function printTable(t)
 end
 
 function EnterGame.loginSuccess(requestId, jsonSession, jsonWorlds, jsonCharacters)
+    if requestId ~= G.requestId then
+        return
+    end
+
     if loadBox then
         loadBox:destroy()
         loadBox = nil
@@ -570,6 +643,13 @@ function EnterGame.loginSuccess(requestId, jsonSession, jsonWorlds, jsonCharacte
         tokenWindow = nil
     end
 
+    -- Reservas para mundo sem endereco/porta na resposta: o host do proprio
+    -- login-server e a porta de jogo declarada em Hegemony_Servers.
+    local server = G.server or currentServer()
+    local fallbackIp = splitLoginUrl(server.login)
+    local fallbackPort = server.gamePort
+    local fallbackName = server.name
+
     local success, err = pcall(function()
         local worlds = {}
         local decodedWorlds = (type(jsonWorlds) == "string" and json.decode(jsonWorlds) or jsonWorlds) or {}
@@ -577,15 +657,15 @@ function EnterGame.loginSuccess(requestId, jsonSession, jsonWorlds, jsonCharacte
             local wIp = world.externaladdressprotected
             if not wIp or #wIp == 0 then wIp = world.externaladdress end
             if not wIp or #wIp == 0 then wIp = world.externaladdressunprotected end
-            if not wIp or #wIp == 0 then wIp = "127.0.0.1" end
+            if not wIp or #wIp == 0 then wIp = fallbackIp end
 
             local wPort = tonumber(world.externalportprotected)
             if not wPort or wPort == 0 then wPort = tonumber(world.externalport) end
             if not wPort or wPort == 0 then wPort = tonumber(world.externalportunprotected) end
-            if not wPort or wPort == 0 then wPort = 7172 end
+            if not wPort or wPort == 0 then wPort = fallbackPort end
 
             worlds[world.id or 0] = {
-                name = world.name or "Hegemony PvP",
+                name = world.name or fallbackName,
                 ip = wIp,
                 port = wPort,
                 previewState = (world.previewstate == 1),
@@ -596,7 +676,7 @@ function EnterGame.loginSuccess(requestId, jsonSession, jsonWorlds, jsonCharacte
         local characters = {}
         local decodedCharacters = (type(jsonCharacters) == "string" and json.decode(jsonCharacters) or jsonCharacters) or {}
         for index, character in ipairs(decodedCharacters) do
-            local world = (character.worldid and worlds[character.worldid]) or worlds[0] or { name = "Hegemony PvP", ip = "127.0.0.1", port = 7172, previewState = false, pvptype = 0 }
+            local world = (character.worldid and worlds[character.worldid]) or worlds[0] or { name = fallbackName, ip = fallbackIp, port = fallbackPort, previewState = false, pvptype = 0 }
             characters[index] = {
                 name = character.name,
                 level = character.level or 1,
@@ -610,9 +690,9 @@ function EnterGame.loginSuccess(requestId, jsonSession, jsonWorlds, jsonCharacte
                 legscolor = character.legscolor or 0,
                 detailcolor = character.detailcolor or 0,
                 addonsflags = character.addonsflags or 0,
-                worldName = world.name or "Hegemony PvP",
-                worldIp = (world.ip and #world.ip > 0) and world.ip or "127.0.0.1",
-                worldPort = (world.port and tonumber(world.port) > 0) and tonumber(world.port) or 7172,
+                worldName = world.name or fallbackName,
+                worldIp = (world.ip and #world.ip > 0) and world.ip or fallbackIp,
+                worldPort = (world.port and tonumber(world.port) > 0) and tonumber(world.port) or fallbackPort,
                 previewState = world.previewState or false,
                 pvptype = world.pvptype or 0,
             }
@@ -642,6 +722,10 @@ function EnterGame.loginSuccess(requestId, jsonSession, jsonWorlds, jsonCharacte
 end
 
 function EnterGame.loginFailed(requestId, msg, result)
+    if requestId ~= G.requestId then
+        return
+    end
+
     if loadBox then
         loadBox:destroy()
         loadBox = nil
@@ -653,12 +737,13 @@ function EnterGame.doLogin()
     G.account = enterGame:getChildById('accountNameTextEdit'):getText()
     G.password = enterGame:getChildById('accountPasswordTextEdit'):getText()
     G.stayLogged = enterGame:getChildById('stayLoggedBox'):isChecked()
-    G.host = 'http://127.0.0.1:8088/login'
-    G.gameHost = '127.0.0.1'
-    G.port = 7171
-    local clientVersion = 1525
+    G.server = currentServer()
+    G.host = G.server.login
+    G.gameHost = (splitLoginUrl(G.server.login))
+    G.port = G.server.loginPort
+    local clientVersion = G.server.protocol or 1525
     G.clientVersion = clientVersion
-    local httpLogin = false
+    local httpLogin = true
 
     if g_game.isOnline() then
         local errorBox = displayErrorBox(tr('Login Error'), tr('Cannot login while already in game.'))
@@ -692,9 +777,6 @@ function EnterGame.doLogin()
     EnterGame.hide()
 
     if clientVersion >= 1281 then
-        if g_game and g_game.setLoginWebService then
-            pcall(g_game.setLoginWebService, 'http://127.0.0.1:8088/login')
-        end
         EnterGame.tryHttpLogin(clientVersion, httpLogin)
     else
         protocolLogin = ProtocolLogin.create()
@@ -760,21 +842,16 @@ function EnterGame.setDefaultServer(host, port, protocol)
     end
 end
 
+-- Esconde os campos de servidor/versao do upstream. Host e porta ja nao
+-- entram aqui: quem manda e o servidor escolhido (EnterGame.selectServer).
 function EnterGame.setUniqueServer(host, port, protocol, windowWidth, windowHeight)
-    host = host or '127.0.0.1'
-    port = port or 7171
     protocol = protocol or 1525
-    EnterGame.setLoginWebService('http://127.0.0.1:8088/login')
-    G.gameHost = host
-    G.port = port
-    
+
     local hostTextEdit = enterGame:getChildById('serverHostTextEdit')
-    hostTextEdit:setText(host)
     hostTextEdit:setVisible(false)
     hostTextEdit:setHeight(0)
 
     local portTextEdit = enterGame:getChildById('serverPortTextEdit')
-    portTextEdit:setText(port)
     portTextEdit:setVisible(false)
     portTextEdit:setHeight(0)
 
@@ -809,21 +886,17 @@ function EnterGame.setUniqueServer(host, port, protocol, windowWidth, windowHeig
     serverListButton:setHeight(0)
     serverListButton:setWidth(0)
 
-    local rememberEmailBox = enterGame:getChildById('rememberEmailBox')
-    rememberEmailBox:setMarginTop(5)
-
-    if not windowWidth then
-        windowWidth = 380
+    -- O tamanho da janela vem do otui; so muda se quem chamar pedir.
+    if windowWidth then
+        enterGame:setWidth(windowWidth)
     end
-    enterGame:setWidth(windowWidth)
-    if not windowHeight then
-        windowHeight = 229
+    if windowHeight then
+        enterGame:setHeight(windowHeight)
     end
 
-    enterGame:setHeight(windowHeight)
-    enterGame.disableToken = true
-    local server = Servers_init[host]
-    enterGame.disableToken = not (server and server.useAuthenticator)
+    local server = currentServer()
+    local serverInit = server and Servers_init[server.login]
+    enterGame.disableToken = not (serverInit and serverInit.useAuthenticator)
 
     -- preload the assets
     -- this is for the client_bottommenu module
@@ -920,11 +993,12 @@ function EnterGame.showAuthenticatorInput()
         
         G.account = enterGame:getChildById('accountNameTextEdit'):getText()
         G.password = enterGame:getChildById('accountPasswordTextEdit'):getText()
-        G.host = '127.0.0.1'
-        G.port = 7171
+        G.server = currentServer()
+        G.host = G.server.login
+        G.port = G.server.loginPort
         G.authenticatorToken = token
-        local clientVersion = 1525
-        local httpLogin = enterGame:getChildById('httpLoginBox'):isChecked()
+        local clientVersion = G.server.protocol or 1525
+        local httpLogin = true
         
         if tokenWindow then
             tokenWindow:destroy()

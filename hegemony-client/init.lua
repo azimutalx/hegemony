@@ -1,11 +1,10 @@
 -- Hegemony PvP Client Initialization Script
 
+-- Services e do upstream; o login de verdade usa Hegemony_Servers (abaixo),
+-- e EnterGame.setLoginWebService reescreve estes campos com o servidor
+-- escolhido na tela de login.
 Services = {
-    login = "http://127.0.0.1:8088/login",
-    status = "http://127.0.0.1:8088/login",
-    createAccount = "http://127.0.0.1:8088/login",
-    loginWebService = "http://127.0.0.1:8088/login",
-    websites = "http://127.0.0.1/",
+    websites = "",
     clientAssets = {
         enabled = false,
         repository = "dudantas/tibia-client",
@@ -21,25 +20,29 @@ Services = {
     },
 }
 
-local ENABLE_SERVERS = true
-
-Servers_init = {}
-
-if ENABLE_SERVERS then
-    Servers_init = {
-        ["http://127.0.0.1:8088/login"] = {
-            port = 8088,
-            protocol = 1525,
-            httpLogin = false,
-            useAuthenticator = false
-        },
-        ["127.0.0.1"] = {
-            port = 7171,
-            protocol = 1525,
-            httpLogin = false
-        }
-    }
-end
+-- Os servidores do cliente, NA ORDEM em que aparecem na tela de login.
+-- Uma lista ordenada e a fonte: o Servers_init do upstream e um mapa, e pairs()
+-- nao garante ordem. `login` e a URL do login-server (webservice); o endereco
+-- e a porta do JOGO nao ficam aqui — vem na resposta do login, em
+-- worlds[].externaladdressprotected / externalportprotected. `gamePort` so e
+-- usado como reserva se a resposta vier sem porta.
+--
+-- Hegemony_Host e a maquina que roda o servidor: 127.0.0.1 para jogar na
+-- propria maquina, o IP do Tailscale do anfitriao (100.x.y.z) no pacote dos
+-- amigos. tools/empacotar.py troca so esta linha. O servidor precisa anunciar
+-- o mesmo endereco (CANARY_SERVER_IP no docker/.env), porque o endereco do
+-- JOGO vem da resposta do login, nao daqui.
+--
+-- Servidores de fora deste repositorio entram por mods/servidores_extras.lua
+-- (lido mais abaixo, depois que a pasta mods/ entra no caminho de busca).
+Hegemony_Host = "127.0.0.1"
+Hegemony_Servers = {
+    {
+        name = "Hegemony PvP", description = "Mundo aberto, pvp-enforced, nasce no 80",
+        login = "http://" .. Hegemony_Host .. ":8088/login", site = "http://" .. Hegemony_Host .. "/",
+        loginPort = 7171, gamePort = 7172, protocol = 1525
+    },
+}
 
 g_app.setName("Hegemony PvP")
 g_app.setCompactName("hegemony")
@@ -73,6 +76,24 @@ g_html.addGlobalStyle('/data/styles/custom.css')
 
 -- try to add mods path too
 g_resources.addSearchPath(g_resources.getWorkDir() .. 'mods', true)
+
+if g_resources.fileExists('/servidores_extras.lua') then
+    dofile('/servidores_extras.lua')
+end
+
+-- Servers_init continua existindo porque client_serverlist e partes do
+-- entergame o consultam; sai de Hegemony_Servers ja com os extras. httpLogin =
+-- true: com false o cliente tenta HTTPS antes a cada login e registra "SSL
+-- connection failed" em todos.
+Servers_init = {}
+for _, servidor in ipairs(Hegemony_Servers) do
+    Servers_init[servidor.login] = {
+        port = servidor.loginPort,
+        protocol = servidor.protocol,
+        httpLogin = true,
+        useAuthenticator = false
+    }
+end
 
 -- setup directory for saving configurations
 g_resources.setupUserWriteDir(('%s/'):format(g_app.getCompactName()))
@@ -116,7 +137,7 @@ local function loadModules()
         dofile(script)
     end
     
-    g_window.setTitle("Hegemony PvP - Tactical War MMORPG")
+    g_window.setTitle("Hegemony")
 end
 
 -- run updater, must use data.zip

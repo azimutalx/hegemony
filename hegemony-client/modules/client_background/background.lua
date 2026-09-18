@@ -7,7 +7,7 @@ function init()
 
     clientVersionLabel = background:getChildById('clientVersionLabel')
     if clientVersionLabel then
-        clientVersionLabel:setText("Hegemony PvP - Tactical War MMORPG\nBuild: 4.1 Release")
+        clientVersionLabel:setText("Hegemony PvP")
     end
 
     connect(g_game, {

@@ -1,27 +1,31 @@
+// Tema "brasa e ferro": texturas geradas por tools/gerar_tema.py. As bordas
+// abaixo (6 nas laterais, 27 na barra de titulo) precisam bater com o que o
+// gerador desenha, senao o 9-slice estica a moldura e corta a barra.
 Window < UIWindow
   font: verdana-11px-antialised
   size: 200 200
   opacity: 1
-  color: #dfe6e9
-  text-offset: 0 4
+  color: #d6aa5c
+  text-offset: 0 7
   text-align: top
-  background-color: #1e2325e6
-  border: 1 #0984e377
-  padding-top: 28
-  padding-left: 12
-  padding-right: 12
-  padding-bottom: 12
+  image-source: /images/ui/hegemony/window
+  image-border: 6
+  image-border-top: 27
+  padding-top: 36
+  padding-left: 14
+  padding-right: 14
+  padding-bottom: 14
 
   $disabled:
-    color: #dfe6e988
+    color: #d6aa5c88
 
   $dragging:
     opacity: 0.9
 
 HeadlessWindow < UIWindow
-  background-color: #1e2325e6
-  border: 1 #0984e377
-  padding: 6
+  image-source: /images/ui/hegemony/window_headless
+  image-border: 6
+  padding: 8
 
 MainWindow < Window
   anchors.centerIn: parent

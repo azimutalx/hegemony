@@ -1,0 +1,3 @@
+# mods/ e local: modulos e servidores extras que vem de fora deste repositorio
+# (o empacotador junta com --mods). Nunca versionar aqui.
+/mods/

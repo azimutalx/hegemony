@@ -1,38 +1,36 @@
+// Tema "brasa e ferro". button.png tem tres estados empilhados de 96x24:
+// normal (y 0), hover (y 24) e pressionado (y 48); borda de 4 px.
 Button < UIButton
   font: cipsoftFont
-  color: #ffffff
+  color: #f3e6d8
   size: 43 20
   text-offset: 0 0
-  background-color: #0984e3
-  border: 1 #0984e3
+  image-source: /images/ui/hegemony/button
+  image-clip: 0 0 96 24
+  image-border: 4
   padding: 4 8 4 8
   opacity: 1.0
 
   $hover !disabled:
-    background-color: #d63031
-    border: 1 #d63031
+    image-clip: 0 24 96 24
     color: #ffffff
 
   $pressed:
-    background-color: #b71c1c
-    border: 1 #b71c1c
-    text-offset: 0 0
-  
+    image-clip: 0 48 96 24
+    text-offset: 0 1
+
   $on:
-    background-color: #d63031
-    border: 1 #d63031
+    image-clip: 0 24 96 24
     text-offset: 0 0
 
   $checked:
-    background-color: #d63031
-    border: 1 #d63031
+    image-clip: 0 24 96 24
     text-offset: 0 0
 
   $disabled:
-    background-color: #0984e355
-    border: 1 #0984e333
-    color: #ffffff77
-    opacity: 0.7
+    image-clip: 0 48 96 24
+    color: #f3e6d866
+    opacity: 0.6
     change-cursor-image: false
 
 TabButton < UIButton
@@ -220,27 +218,25 @@ QtButton < UIButton
   font: cipsoftFont
   size: 106 23
   text-offset: 0 0
-  background-color: #0984e3
-  border: 1 #0984e3
+  image-source: /images/ui/hegemony/button
+  image-clip: 0 0 96 24
+  image-border: 4
   padding: 4 8 4 8
   opacity: 1.0
-  color: #ffffff
+  color: #f3e6d8
 
   $hover !disabled:
-    background-color: #d63031
-    border: 1 #d63031
+    image-clip: 0 24 96 24
     color: #ffffff
 
   $pressed:
-    background-color: #b71c1c
-    border: 1 #b71c1c
-    text-offset: 0 0
+    image-clip: 0 48 96 24
+    text-offset: 0 1
 
   $disabled:
-    background-color: #0984e355
-    border: 1 #0984e333
-    color: #ffffff77
-    opacity: 0.7
+    image-clip: 0 48 96 24
+    color: #f3e6d866
+    opacity: 0.6
 
 BigPremiumButton < UIButton
   size: 128 37

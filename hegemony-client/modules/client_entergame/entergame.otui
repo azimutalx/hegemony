@@ -1,27 +1,128 @@
-EnterGameWindow < MainWindow
-  !text: 'Hegemony PvP - Login'
-  size: 260 220
-  background-color: #1e2325e6
-  border: 1 #0984e377
-  image-source: 
+// Tela de login do Hegemony. Os estilos Hegemony* abaixo usam as texturas de
+// tools/gerar_tema.py; os campos no fim do arquivo continuam existindo com
+// altura zero porque entergame.lua e client_serverlist ainda os consultam.
+HegemonyLoginLabel < Label
+  font: verdana-11px-antialised
+  color: #c9b79c
+  text-auto-resize: true
 
+HegemonyField < UITextEdit
+  font: verdana-11px-antialised
+  color: #f3e6d8
+  height: 26
+  text-offset: 0 5
+  padding: 4 8 4 8
+  image-source: /images/ui/hegemony/textedit
+  image-clip: 0 0 64 24
+  image-border: 2
+  selection-color: #ffffff
+  selection-background-color: #8e3520
+  change-cursor-image: false
 
-EnterGameButton < Button
-  width: 64
+  $focus:
+    image-clip: 0 24 64 24
+
+HegemonyPasswordField < HegemonyField
+  text-hidden: true
+  padding-right: 28
+
+  UICheckBox
+    size: 19 20
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: -24
+    image-rect: 0 0 19 20
+    image-source: /images/ui/hide_eye
+    image-color: #d6aa5c
+    !tooltip: tr('Mostrar senha')
+    @onCheckChange: |
+      self:getParent():setTextHidden(not self:isChecked())
+      self:getParent():setTextWrap(false)
+
+    $!checked:
+      image-clip: 0 0 19 20
+
+    $checked:
+      image-clip: 0 20 19 20
+
+HegemonyComboBox < UIComboBox
+  font: verdana-11px-antialised
+  color: #f3e6d8
+  height: 26
+  text-align: left
+  text-offset: 10 1
+  image-source: /images/ui/hegemony/combobox
+  image-clip: 0 0 128 24
+  image-border: 3
+  image-border-right: 22
+
+  $hover !disabled:
+    image-clip: 0 24 128 24
+
+  $on:
+    image-clip: 0 48 128 24
+
+HegemonyComboBoxPopupMenu < UIPopupMenu
+  image-source: /images/ui/hegemony/window_headless
+  image-border: 6
+  padding: 3
+
+HegemonyComboBoxPopupMenuButton < UIButton
+  height: 24
+  font: verdana-11px-antialised
+  text-align: left
+  text-offset: 8 0
+  color: #c9b79c
+  background-color: alpha
+
+  $hover !disabled:
+    color: #ffffff
+    background-color: #8e352099
+
+HegemonyCheckBox < UICheckBox
+  size: 14 14
+  font: verdana-11px-antialised
+  text-align: left
+  text-offset: 20 0
+  color: #c9b79c
+  image-rect: 0 0 14 14
+  image-source: /images/ui/hegemony/checkbox
+
+  $!checked:
+    image-clip: 0 0 14 14
+
+  $checked !disabled:
+    image-clip: 0 14 14 14
+
+  $checked disabled:
+    image-clip: 0 28 14 14
+
+HegemonyLink < UIButton
+  font: verdana-11px-antialised
+  color: #d6aa5c
+  text-auto-resize: true
+
+  $hover:
+    color: #ffffff
+
+// Mesma assinatura do upstream: toggleStayLoggedBox e setUniqueServer leem
+// estes campos. Ancorada a direita, sobre a parte escurecida do fundo.
+EnterGameWindow < Window
+  !text: 'Hegemony'
+  size: 300 348
+  anchors.right: parent.right
+  anchors.verticalCenter: parent.verticalCenter
+  // Um pouco abaixo do centro para nao cobrir o fim do logotipo da arte.
+  margin-top: 70
+  margin-right: 90
+  draggable: false
+  padding-left: 22
+  padding-right: 22
 
 ServerListButton < UIButton
   size: 17 17
   image-source: /images/topbuttons/minimap
   image-color: #ffffffff
-
-  $hover !disabled:
-    image-color: #ffffff99
-
-  $pressed:
-    image-color: #ffffff44
-
-  $disabled:
-    image-color: #ffffff55
 
 EnterGameWindow
   id: enterGame
@@ -29,159 +130,135 @@ EnterGameWindow
   &authenticatorHeight: 44
   &stayLoggedBoxEnabled: false
   &stayLoggedBoxHeight: 24
-  size: 260 220
-  background-color: #1e2325e6
-  border: 1 #0984e377
-  image-source: 
   @onEnter: EnterGame.doLogin()
 
-  Label
-    id: emailLabel
-    !text: tr('Acc Name:') 
+  HegemonyLoginLabel
+    id: serverChoiceLabel
+    !text: tr('Servidor')
     anchors.left: parent.left
     anchors.top: parent.top
-    margin-top: 8
-    color: #dfe6e9
-    opacity: 0.9
 
-  HiddenTextQtToggleEdit
-    id: accountNameTextEdit
+  HegemonyComboBox
+    id: serverComboBox
+    anchors.left: parent.left
     anchors.right: parent.right
-    anchors.left: emailLabel.right
-    anchors.verticalCenter: emailLabel.verticalCenter
-    margin-left: 10
-    background-color: #0f141cd0
-    border: 1 #0984e366
-    color: #dfe6e9
+    anchors.top: serverChoiceLabel.bottom
+    margin-top: 5
 
   Label
+    id: serverDescriptionLabel
+    font: verdana-11px-antialised
+    color: #8f7f6a
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: serverComboBox.bottom
+    margin-top: 5
+    text-auto-resize: true
+
+  HorizontalSeparator
+    id: loginSeparator
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: serverDescriptionLabel.bottom
+    margin-top: 12
+
+  HegemonyLoginLabel
+    id: emailLabel
+    !text: tr('Email')
+    anchors.left: parent.left
+    anchors.top: loginSeparator.bottom
+    margin-top: 12
+
+  HegemonyField
+    id: accountNameTextEdit
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: emailLabel.bottom
+    margin-top: 5
+
+  HegemonyLoginLabel
     id: passwordLabel
-    !text: tr('Password:')
+    !text: tr('Senha')
     anchors.left: parent.left
     anchors.top: accountNameTextEdit.bottom
-    margin-top: 14
-    color: #dfe6e9
-    opacity: 0.9
+    margin-top: 12
 
-  HiddenTextQtEdit
+  HegemonyPasswordField
     id: accountPasswordTextEdit
+    anchors.left: parent.left
     anchors.right: parent.right
-    anchors.left: passwordLabel.right
-    anchors.verticalCenter: passwordLabel.verticalCenter
-    margin-left: 10
-    background-color: #0f141cd0
-    border: 1 #0984e366
-    color: #dfe6e9
+    anchors.top: passwordLabel.bottom
+    margin-top: 5
 
-  QtCheckBox
+  HegemonyCheckBox
     id: rememberEmailBox
-    !text: tr('Remember password')
-    !tooltip: tr('Remember account and password when starts client')
+    !text: tr('Lembrar email e senha')
+    !tooltip: tr('Guarda email e senha deste servidor no config.otml')
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: accountPasswordTextEdit.bottom
     margin-top: 12
-    color: #dfe6e9
-    opacity: 0.85
     @onCheckChange: |
       self:getParent():getChildById('autoLoginBox'):setEnabled(self:isChecked())
-      self:getParent():getChildById('rememberEmailTip'):setOn(self:isChecked())
 
-  UIWidget
-    id: rememberEmailTip
-    image-source: /images/icons/show_gui_help_grey
-    !specialtooltip: 'Be aware that your email address will be stored on your configuration file "config.otml" if you activate this option.'
-    anchors.right: accountNameTextEdit.right
-    anchors.verticalCenter: rememberEmailBox.verticalCenter
-    visible: false
-
-    $on:
-      visible: true
-
-    $!on:
-      visible: false
-
-  UIButton
-    !text: tr('Forgot password and/or email')
-    id: Forgot_password_email
-    font: verdana-11px-monochrome-underline
-    color: #dfe6e9
-    text-align: left
+  Button
+    id: loginButton
+    !text: tr('Entrar')
+    font: verdana-11px-antialised
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: rememberEmailBox.bottom
-    opacity: 0.75
-    margin-top: 4
-    @onClick: g_platform.openUrl('http://127.0.0.1/')
-
-  QtButton
-    id: loginButton
-    !text: tr('Login')
-    anchors.horizontalCenter: parent.horizontalCenter
-    anchors.top: Forgot_password_email.bottom
-    margin-top: 12
-    size: 130 24
-    background-color: #0984e3cc
-    border: 1 #0984e3ff
-    color: #ffffff
-    font: verdana-11px-monochrome
-    $hover:
-      background-color: #d63031cc
-      border: 1 #d63031ff
+    margin-top: 16
+    height: 32
     @onClick: EnterGame.doLogin()
 
-  UIButton
+  HegemonyLink
     id: createAccountLink
-    !text: tr('Criar Conta')
-    font: verdana-11px-monochrome-underline
-    color: #dfe6e9
-    text-align: center
-    anchors.horizontalCenter: parent.horizontalCenter
+    !text: tr('Criar conta')
+    anchors.left: parent.left
     anchors.top: loginButton.bottom
-    margin-top: 8
-    opacity: 0.9
-    $hover:
-      color: #ffffff
-      opacity: 1.0
-    @onClick: g_platform.openUrl('http://127.0.0.1/')
+    margin-top: 12
+    @onClick: EnterGame.openSite('?account/create')
+
+  HegemonyLink
+    id: Forgot_password_email
+    !text: tr('Esqueci a senha')
+    anchors.right: parent.right
+    anchors.top: loginButton.bottom
+    margin-top: 12
+    @onClick: EnterGame.openSite('?account/lost')
+
+  // --- Campos do upstream, escondidos -------------------------------------
+
+  UIWidget
+    id: rememberEmailTip
+    visible: false
+    height: 0
 
   QtCheckBox
     id: stayLoggedBox
     !text: tr('Stay logged during session')
     anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.top: parent.bottom
-    visible: false
-    height: 0
-
-  HorizontalSeparator
-    anchors.left: parent.left
-    anchors.right: parent.right
     anchors.top: parent.bottom
     visible: false
     height: 0
 
   MenuLabel
     id: serverLabel
-    !text: tr('Server')
     anchors.left: parent.left
     anchors.top: parent.bottom
-    text-auto-resize: true
     visible: false
     height: 0
 
   ServerListButton
     id: serverListButton
-    !tooltip: tr('Server list')
     anchors.right: parent.right
     anchors.top: parent.bottom
-    @onClick: EnterGame.showServerList()
     visible: false
     height: 0
 
   TextEdit
     id: serverHostTextEdit
-    !tooltip: tr('Make sure that your client uses\nthe correct game client version')
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: parent.bottom
@@ -190,10 +267,8 @@ EnterGameWindow
 
   MenuLabel
     id: versionLabel
-    !text: tr('Client Version')
     anchors.left: parent.left
     anchors.top: parent.bottom
-    text-auto-resize: true
     visible: false
     height: 0
 
@@ -206,9 +281,7 @@ EnterGameWindow
   ComboBox
     id: clientComboBox
     anchors.left: parent.left
-    anchors.right: parent.horizontalCenter
     anchors.top: parent.bottom
-    width: 90
     visible: false
     height: 0
 
@@ -220,18 +293,14 @@ EnterGameWindow
 
   MenuLabel
     id: portLabel
-    !text: tr('Port')
     anchors.left: parent.left
     anchors.top: parent.bottom
-    text-auto-resize: true
     visible: false
     height: 0
 
   TextEdit
     id: serverPortTextEdit
-    text: 7171
-    anchors.right: parent.right
-    anchors.left: parent.horizontalCenter
+    anchors.left: parent.left
     anchors.top: parent.bottom
     visible: false
     height: 0
@@ -239,43 +308,28 @@ EnterGameWindow
   QtCheckBox
     id: autoLoginBox
     enabled: false
-    !text: tr('Auto login')
-    !tooltip: tr('Open charlist automatically when starting client')
     anchors.left: parent.left
-    anchors.right: parent.right
     anchors.top: parent.bottom
     visible: false
     height: 0
 
   QtCheckBox
     id: httpLoginBox
-    enabled: true
-    !text: tr('Enable HTTP login')
-    !tooltip: tr('If login fails using HTTPS (encrypted) try with HTTP (unencrypted)')
     anchors.left: parent.left
-    anchors.right: parent.right
     anchors.top: parent.bottom
     visible: false
     height: 0
 
   QtButton
     id: btnCreateNewAccount
-    !text: tr('Create New Account')
     anchors.left: parent.left
     anchors.top: parent.bottom
-    size: 109 20
     visible: false
     height: 0
-    @onClick: |
-      self:disable()
-      createWidgetAccount()
 
   Label
     id: serverInfoLabel
-    font: verdana-11px-rounded
-    anchors.top: parent.bottom
     anchors.left: parent.left
-    color: green
-    text-auto-resize: true
+    anchors.top: parent.bottom
     visible: false
     height: 0

@@ -390,8 +390,11 @@ local function tryLogin(charInfo, tries)
 
     CharacterList.hide()
 
-    local host = (charInfo.worldHost and #charInfo.worldHost > 0) and charInfo.worldHost or "127.0.0.1"
-    local port = (charInfo.worldPort and tonumber(charInfo.worldPort) > 0) and tonumber(charInfo.worldPort) or 7172
+    -- Reserva: o servidor escolhido na tela de login (Hegemony_Servers).
+    local server = G.server or {}
+    local fallbackHost = (server.login and server.login:match('^https?://([^/:]+)')) or "127.0.0.1"
+    local host = (charInfo.worldHost and #charInfo.worldHost > 0) and charInfo.worldHost or fallbackHost
+    local port = (charInfo.worldPort and tonumber(charInfo.worldPort) > 0) and tonumber(charInfo.worldPort) or server.gamePort or 7172
     local clientVer = G.clientVersion or 1525
     local charName = charInfo.characterName or ""
     local sessionKey = (G.sessionKey and #G.sessionKey > 0) and G.sessionKey or (((G.account or "") .. "\n" .. (G.password or "")))
@@ -407,7 +410,7 @@ local function tryLogin(charInfo, tries)
     g_game.cancelLogin()
     g_logger.info("After cancelLogin: isLogging=" .. tostring(g_game.isLogging()))
 
-    g_game.loginWorld(G.account or "", G.password or "", charInfo.worldName or "Hegemony PvP", host, port,
+    g_game.loginWorld(G.account or "", G.password or "", charInfo.worldName or server.name or "", host, port,
                       charName, G.authenticatorToken or "", sessionKey)
 
     g_logger.info("After loginWorld: isLogging=" .. tostring(g_game.isLogging()))
@@ -961,9 +964,9 @@ function CharacterList.doLogin()
         end
 
         local charInfo = {
-            worldHost = (selected and selected.worldHost and #selected.worldHost > 0) and selected.worldHost or "127.0.0.1",
-            worldPort = (selected and selected.worldPort and tonumber(selected.worldPort) > 0) and tonumber(selected.worldPort) or 7172,
-            worldName = (selected and selected.worldName) or "Hegemony PvP",
+            worldHost = selected and selected.worldHost,
+            worldPort = selected and selected.worldPort,
+            worldName = selected and selected.worldName,
             characterName = charName or "GOD Hegemony"
         }
         charactersWindow:hide()
