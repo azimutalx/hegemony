@@ -105,8 +105,15 @@ function flaskPotion.onUse(player, item, fromPosition, target, toPosition, isHot
 		player:addAchievementProgress("Potion Addict", 100000)
 		target:say("Aaaah...", MESSAGE_POTION)
 
+		-- Com pocao infinita (removeChargesFromPotions = false) a pocao nao e
+		-- consumida, entao nao pode existir frasco vazio. O frasco era entregue
+		-- aqui, ANTES da checagem de consumo mais abaixo: cada gole gerava um
+		-- frasco novo sem gastar a pocao. Em PvP, onde se bebe o tempo todo, a
+		-- mochila enchia em segundos e o excedente caia no chao, acumulando
+		-- milhares de itens no mapa e inchando o save.
+		local potionConsumed = configManager.getBoolean(configKeys.REMOVE_POTION_CHARGES)
 		local deactivatedFlasks = player:kv():get("talkaction.potions.flask") or false
-		if not deactivatedFlasks then
+		if potionConsumed and not deactivatedFlasks then
 			if fromPosition.x == CONTAINER_POSITION then
 				player:addItem(potion.flask, 1)
 			else

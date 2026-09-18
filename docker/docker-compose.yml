@@ -85,6 +85,7 @@ services:
       # git a cada container novo.
       - '../data-otservbr-global/monster/quests/heart_of_destruction/eradicator2.lua:/canary/data-otservbr-global/monster/quests/heart_of_destruction/eradicator2.lua:ro'
       - '../data-otservbr-global/scripts/globalevents/others/check_mount.lua:/canary/data-otservbr-global/scripts/globalevents/others/check_mount.lua:ro'
+      - '../data/scripts/actions/items/potions.lua:/canary/data/scripts/actions/items/potions.lua:ro'
     depends_on:
       db:
         condition: service_healthy

@@ -62,5 +62,19 @@ set_config maxPlayers 100
 # bloqueante: com player_items grande, sao minutos de arranque a cada restart.
 set_config startupDatabaseOptimization false
 
+# Suprimentos infinitos: rune, pocao, municao e arma com carga nunca se gastam.
+# O motor ja suporta isso nativamente (spells.cpp, weapons.cpp, potions.lua).
+# Atencao: potions.lua entregava frasco vazio a cada gole mesmo sem consumir a
+# pocao — corrigido no datapack e montado pelo compose.
+set_config removeChargesFromRunes false
+set_config removeChargesFromPotions false
+set_config removeWeaponAmmunition false
+set_config removeWeaponCharges false
+
+# Os personagens nascem promovidos (MS, ED, RP, EK). O login.lua rebaixa
+# promovido em conta sem premium A CADA LOGIN: sem isto, um ED criado numa conta
+# gratis viraria Druid comum na primeira entrada.
+set_config freePremium true
+
 echo ""
 exec /canary/start.sh "$@"
