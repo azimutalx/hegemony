@@ -1,0 +1,23 @@
+var activeMenu = 'news';
+
+function initMenu() {
+	menuSwitch(activeMenu);
+}
+
+function menuSwitch(id) {
+	var categories = ['news', 'account', 'community', 'library', 'shops'];
+	for(var i = 0; i < categories.length; i++) {
+		var cat = categories[i];
+		var el = document.getElementById(cat);
+		var sub = document.getElementById(cat + '-submenu');
+		if(el) {
+			if(cat === id) {
+				el.className = 'nav-tab active';
+				if(sub) sub.style.display = 'flex';
+			} else {
+				el.className = 'nav-tab';
+				if(sub) sub.style.display = 'none';
+			}
+		}
+	}
+}

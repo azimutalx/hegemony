@@ -1,0 +1,19 @@
+<div class="hegemony-news-box">
+	<div class="hegemony-news-header">
+		<div class="hegemony-news-meta">
+			<span class="hegemony-news-date">{{ date|date(setting('core.news_date_format')) }}</span>
+			{% if setting('core.news_author') and author is not empty %}
+			<span class="hegemony-news-author">COMMANDER: {{ author }}</span>
+			{% endif %}
+		</div>
+		<h2 class="hegemony-news-title">{{ title }}</h2>
+	</div>
+	<div class="hegemony-news-body">
+		{{ content|raw }}
+	</div>
+	{% if comments is not null %}
+	<div class="hegemony-news-footer">
+		<a href="{{ comments }}" class="hegemony-btn hegemony-btn-sm">» WAR ROOM DISCUSSIONS</a>
+	</div>
+	{% endif %}
+</div>

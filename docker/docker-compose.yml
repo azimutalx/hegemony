@@ -101,7 +101,13 @@ services:
       # Tema proprio versionado no repositorio. Sem este mount o tema so
       # existiria na camada gravavel do container e sumiria no primeiro
       # "docker compose build myaac".
-      - '../site/templates/hegemony:/var/www/html/templates/hegemony'
+      #
+      # O caminho aponta para dentro do repo de proposito. Antes vinha de
+      # ../site/, um clone do MyAAC com .git proprio: o git tratava como
+      # repositorio aninhado e nao versionava o tema: em qualquer maquina que
+      # so clonasse este repo, o mount criava um diretorio vazio e o site subia
+      # sem tema.
+      - './quickstart/myaac/templates/hegemony:/var/www/html/templates/hegemony'
     networks:
       - canary-net
     depends_on:

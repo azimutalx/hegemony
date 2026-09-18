@@ -1,0 +1,920 @@
+/* ==========================================================================
+   HEGEMONY PVP - TACTICAL WAR DESIGN SYSTEM
+   Palette:
+   - Primary Lead Gray: #2D3436
+   - Dark Charcoal: #1E2325
+   - Steel Blue (Calculated/Tactical): #0984E3
+   - Steel Blue Hover: #74B9FF
+   - Scarlet Red (Critical Alert/Danger): #D63031
+   - Scarlet Red Hover: #FF7675
+   - Light Silver Text: #DFE6E9
+   ========================================================================== */
+
+:root {
+	--bg-lead: #2D3436;
+	--bg-dark: #1E2325;
+	--bg-panel: rgba(45, 52, 54, 0.95);
+	--border-metal: #485460;
+	--steel-blue: #0984E3;
+	--steel-blue-glow: rgba(9, 132, 227, 0.35);
+	--steel-hover: #74B9FF;
+	--scarlet-red: #D63031;
+	--scarlet-red-glow: rgba(214, 48, 49, 0.4);
+	--scarlet-hover: #FF7675;
+	--text-light: #DFE6E9;
+	--text-muted: #B2BEC3;
+	--font-title: 'Outfit', 'Impact', sans-serif;
+	--font-body: 'Roboto Condensed', sans-serif;
+}
+
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	background-color: #2D3436;
+	background-image: 
+		radial-gradient(circle at 50% 0%, rgba(9, 132, 227, 0.2) 0%, transparent 60%),
+		linear-gradient(180deg, #2D3436 0%, #1E2325 100%);
+	color: var(--text-light);
+	font-family: var(--font-body);
+	font-size: 15px;
+	line-height: 1.6;
+	min-height: 100vh;
+}
+
+a {
+	color: var(--steel-blue);
+	text-decoration: none;
+	transition: all 0.2s ease;
+}
+
+a:hover {
+	color: var(--steel-hover);
+	text-shadow: 0 0 8px var(--steel-blue-glow);
+}
+
+/* ==========================================================================
+   HEADER SECTION
+   ========================================================================== */
+#hegemony-header {
+	position: relative;
+	width: 100%;
+	height: 280px;
+	background: url('images/header-background.png') center/cover no-repeat;
+	border-bottom: 3px solid var(--steel-blue);
+	box-shadow: 0 5px 25px rgba(0, 0, 0, 0.8);
+	overflow: hidden;
+}
+
+.header-overlay {
+	position: absolute;
+	top: 0; left: 0; right: 0; bottom: 0;
+	background: linear-gradient(180deg, rgba(30, 35, 37, 0.4) 0%, rgba(45, 52, 54, 0.9) 100%);
+}
+
+.header-content {
+	position: relative;
+	max-width: 1280px;
+	height: 100%;
+	margin: 0 auto;
+	padding: 0 24px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.brand-logo-container {
+	display: flex;
+	align-items: center;
+	gap: 20px;
+}
+
+.hegemony-brand-logo {
+	width: 140px;
+	height: 140px;
+	border-radius: 12px;
+	border: 2px solid var(--steel-blue);
+	box-shadow: 0 0 20px var(--steel-blue-glow), 0 0 40px rgba(0, 0, 0, 0.7);
+	object-fit: cover;
+}
+
+.brand-titles {
+	display: flex;
+	flex-direction: column;
+}
+
+.hegemony-title {
+	font-family: var(--font-title);
+	font-weight: 900;
+	font-style: italic;
+	font-size: 3.2rem;
+	letter-spacing: 2px;
+	text-transform: uppercase;
+	color: #FFFFFF;
+	text-shadow: 0 4px 10px rgba(0, 0, 0, 0.9), 0 0 20px rgba(255, 255, 255, 0.2);
+	line-height: 1;
+}
+
+.hegemony-title span {
+	color: var(--scarlet-red);
+	text-shadow: 0 0 15px var(--scarlet-red-glow);
+}
+
+.hegemony-subtitle {
+	font-family: var(--font-title);
+	font-weight: 700;
+	font-style: italic;
+	font-size: 1rem;
+	letter-spacing: 3px;
+	color: var(--steel-hover);
+	margin-top: 6px;
+	text-shadow: 0 0 10px var(--steel-blue-glow);
+}
+
+/* Status Pill */
+.server-status-pill {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	background: rgba(30, 35, 37, 0.85);
+	backdrop-filter: blur(8px);
+	border: 1px solid var(--border-metal);
+	padding: 12px 20px;
+	border-radius: 8px;
+	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+.status-indicator {
+	width: 14px;
+	height: 14px;
+	border-radius: 50%;
+}
+
+.status-indicator.online {
+	background: #00B894;
+	box-shadow: 0 0 12px #00B894;
+}
+
+.status-indicator.offline {
+	background: var(--scarlet-red);
+	box-shadow: 0 0 12px var(--scarlet-red);
+}
+
+.status-info {
+	display: flex;
+	flex-direction: column;
+}
+
+.status-label {
+	font-size: 0.75rem;
+	font-weight: 700;
+	letter-spacing: 1px;
+	color: var(--text-muted);
+}
+
+.status-val {
+	font-family: var(--font-title);
+	font-weight: 700;
+	font-size: 0.95rem;
+	color: #FFFFFF;
+}
+
+.status-val.red {
+	color: var(--scarlet-red);
+}
+
+/* ==========================================================================
+   NAVIGATION BAR
+   ========================================================================== */
+#hegemony-nav {
+	background: var(--bg-dark);
+	border-bottom: 2px solid #2D3436;
+	box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+}
+
+.nav-tabs-container {
+	max-width: 1280px;
+	margin: 0 auto;
+	padding: 0 24px;
+	display: flex;
+	gap: 4px;
+}
+
+.nav-tab {
+	background: transparent;
+	border: none;
+	color: var(--text-muted);
+	font-family: var(--font-title);
+	font-weight: 700;
+	font-style: italic;
+	font-size: 1rem;
+	letter-spacing: 1.5px;
+	padding: 16px 24px;
+	cursor: pointer;
+	transition: all 0.25s ease;
+	border-bottom: 3px solid transparent;
+}
+
+.nav-tab:hover {
+	color: #FFFFFF;
+	background: rgba(9, 132, 227, 0.15);
+}
+
+.nav-tab.active {
+	color: #FFFFFF;
+	background: var(--steel-blue);
+	border-bottom: 3px solid var(--scarlet-red);
+	box-shadow: 0 0 15px var(--steel-blue-glow);
+}
+
+/* Submenu */
+#hegemony-submenu {
+	background: #181C1D;
+	border-bottom: 1px solid var(--border-metal);
+}
+
+.submenu-row {
+	max-width: 1280px;
+	margin: 0 auto;
+	padding: 10px 24px;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 20px;
+}
+
+.submenu-item {
+	font-family: var(--font-title);
+	font-weight: 700;
+	font-size: 0.9rem;
+	color: var(--text-light);
+	letter-spacing: 1px;
+	padding: 4px 8px;
+	border-radius: 4px;
+}
+
+.submenu-item:hover {
+	color: #FFFFFF;
+	background: rgba(9, 132, 227, 0.25);
+}
+
+/* ==========================================================================
+   MAIN LAYOUT & SIDEBARS
+   ========================================================================== */
+#hegemony-main {
+	max-width: 1280px;
+	margin: 30px auto;
+	padding: 0 24px;
+}
+
+.layout-grid {
+	display: grid;
+	grid-template-columns: 260px 1fr 260px;
+	gap: 24px;
+}
+
+/* Panels */
+.panel-box {
+	background: var(--bg-lead);
+	border: 1px solid var(--border-metal);
+	border-radius: 8px;
+	margin-bottom: 24px;
+	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+	overflow: hidden;
+}
+
+.panel-header {
+	background: linear-gradient(90deg, #1E2325 0%, #2D3436 100%);
+	padding: 14px 18px;
+	border-bottom: 2px solid var(--steel-blue);
+}
+
+.panel-header.danger {
+	border-bottom: 2px solid var(--scarlet-red);
+}
+
+.panel-header h3 {
+	font-family: var(--font-title);
+	font-weight: 900;
+	font-style: italic;
+	font-size: 1.1rem;
+	letter-spacing: 1px;
+	color: #FFFFFF;
+}
+
+.panel-body {
+	padding: 18px;
+}
+
+.panel-subtitle {
+	font-size: 0.85rem;
+	color: var(--text-muted);
+	margin-bottom: 14px;
+}
+
+/* Buttons */
+.btn-hegemony {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-family: var(--font-title);
+	font-weight: 900;
+	font-style: italic;
+	font-size: 0.95rem;
+	letter-spacing: 1px;
+	padding: 12px 20px;
+	border-radius: 6px;
+	border: none;
+	cursor: pointer;
+	transition: all 0.25s ease;
+	text-transform: uppercase;
+	margin-bottom: 10px;
+}
+
+.btn-hegemony.block {
+	width: 100%;
+}
+
+.btn-hegemony.primary {
+	background: var(--steel-blue);
+	color: #FFFFFF;
+	box-shadow: 0 4px 12px var(--steel-blue-glow);
+}
+
+.btn-hegemony.primary:hover {
+	background: var(--steel-hover);
+	transform: translateY(-2px);
+	box-shadow: 0 6px 18px var(--steel-blue-glow);
+}
+
+.btn-hegemony.secondary {
+	background: #485460;
+	color: #FFFFFF;
+}
+
+.btn-hegemony.secondary:hover {
+	background: #808e9b;
+	transform: translateY(-2px);
+}
+
+.btn-hegemony.danger {
+	background: var(--scarlet-red);
+	color: #FFFFFF;
+	box-shadow: 0 4px 12px var(--scarlet-red-glow);
+}
+
+.btn-hegemony.danger:hover {
+	background: var(--scarlet-hover);
+	transform: translateY(-2px);
+	box-shadow: 0 6px 18px var(--scarlet-red-glow);
+}
+
+.hegemony-btn-sm {
+	padding: 8px 14px;
+	font-size: 0.85rem;
+}
+
+/* Info Rows */
+.info-list {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.info-row {
+	display: flex;
+	justify-content: space-between;
+	font-size: 0.88rem;
+	padding-bottom: 8px;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.highlight-blue {
+	color: var(--steel-hover);
+	font-weight: 700;
+}
+
+.highlight-red {
+	color: var(--scarlet-hover);
+	font-weight: 700;
+}
+
+/* ==========================================================================
+   CONTENT AREA
+   ========================================================================== */
+.content-box {
+	background: var(--bg-lead);
+	border: 1px solid var(--border-metal);
+	border-radius: 8px;
+	box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+	overflow: hidden;
+}
+
+.content-header {
+	background: linear-gradient(90deg, #1E2325 0%, var(--bg-lead) 100%);
+	padding: 18px 24px;
+	border-bottom: 2px solid var(--steel-blue);
+}
+
+.content-header h2 {
+	font-family: var(--font-title);
+	font-weight: 900;
+	font-style: italic;
+	font-size: 1.6rem;
+	letter-spacing: 1px;
+	color: #FFFFFF;
+	text-transform: uppercase;
+}
+
+.content-body {
+	padding: 24px;
+}
+
+/* News Box */
+.hegemony-news-box {
+	background: var(--bg-dark);
+	border: 1px solid var(--border-metal);
+	border-radius: 8px;
+	margin-bottom: 24px;
+	padding: 20px;
+	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.hegemony-news-header {
+	border-bottom: 1px solid var(--border-metal);
+	padding-bottom: 12px;
+	margin-bottom: 16px;
+}
+
+.hegemony-news-meta {
+	display: flex;
+	gap: 15px;
+	font-size: 0.8rem;
+	font-weight: 700;
+	color: var(--text-muted);
+	margin-bottom: 6px;
+}
+
+.hegemony-news-author {
+	color: var(--steel-hover);
+}
+
+.hegemony-news-title {
+	font-family: var(--font-title);
+	font-weight: 900;
+	font-style: italic;
+	font-size: 1.4rem;
+	color: #FFFFFF;
+}
+
+.hegemony-news-body {
+	font-size: 0.95rem;
+	line-height: 1.7;
+	color: var(--text-light);
+}
+
+.hegemony-news-footer {
+	margin-top: 16px;
+	display: flex;
+	justify-content: flex-end;
+}
+
+/* Tables Styling */
+table {
+	width: 100%;
+	border-collapse: collapse;
+	margin: 16px 0;
+}
+
+th {
+	background: var(--bg-dark);
+	font-family: var(--font-title);
+	font-weight: 700;
+	font-style: italic;
+	color: var(--steel-hover);
+	padding: 12px 14px;
+	text-align: left;
+	border-bottom: 2px solid var(--steel-blue);
+	text-transform: uppercase;
+	font-size: 0.9rem;
+}
+
+td {
+	padding: 12px 14px;
+	border-bottom: 1px solid rgba(255,255,255,0.05);
+	font-size: 0.92rem;
+}
+
+tr:nth-child(even) {
+	background: rgba(30, 35, 37, 0.5);
+}
+
+/* ==========================================================================
+   FOOTER
+   ========================================================================== */
+#hegemony-footer {
+	background: var(--bg-dark);
+	border-top: 2px solid var(--border-metal);
+	padding: 30px 24px;
+	margin-top: 50px;
+	text-align: center;
+	color: var(--text-muted);
+	font-size: 0.9rem;
+}
+
+.footer-content {
+	max-width: 1280px;
+	margin: 0 auto;
+}
+
+.footer-credits {
+	font-size: 0.8rem;
+	margin-top: 6px;
+	color: #636e72;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+	.layout-grid {
+		grid-template-columns: 1fr;
+	}
+	.brand-logo-container {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+	.hegemony-title {
+		font-size: 2.4rem;
+	}
+}
+
+/* ==========================================================================
+   BUTTONS, HIGHLIGHT PANELS, ALERTS & HIGHSCORES COLOR OVERRIDES
+   ========================================================================== */
+button, 
+input[type="submit"], 
+input[type="button"], 
+.btn, 
+.btn-primary, 
+.btn-hegemony.primary,
+.panel-box.highlight {
+	background-color: #0984E3 !important;
+	color: #FFFFFF !important;
+}
+
+.alert, 
+.alert-danger, 
+.error, 
+.errorbox, 
+.highscores-title, 
+.threat-panel .panel-header, 
+.panel-header.danger,
+h1.highscores, 
+h2.highscores {
+	background-color: #D63031 !important;
+	color: #FFFFFF !important;
+}
+
+a:hover {
+	color: #D63031 !important;
+}
+
+.top-ranking, .death-ranking, .rank-1, .highlight-scarlet {
+	color: #D63031 !important;
+	font-weight: bold;
+}
+
+
+/* ==========================================================================
+   MYAAC CLASSIC CHROME OVERRIDE
+   O MyAAC gera as paginas de conta, personagem e highscores com a moldura
+   classica do Tibia.com: tabelas .Table1-.Table5 com gifs de madeira e sombra
+   aplicados por style inline. O tema nao cobria nenhuma dessas classes, entao
+   a textura crua aparecia sobre o fundo escuro.
+   Como os gifs vem em atributo style inline, neutraliza-los exige !important.
+   ========================================================================== */
+
+/* 1. Elimina a moldura/sombra de madeira herdada do Tibia. */
+.TableShadowContainer,
+.TableShadowContainerRightTop,
+.TableShadowRightTop,
+.TableContentAndRightShadow,
+.TableBottomShadow,
+.TableBottomLeftShadow,
+.TableBottomRightShadow,
+.TableShadowLeft,
+.TableShadowRight,
+.CaptionContainer,
+.CaptionInnerContainer {
+	background-image: none !important;
+	background-color: transparent !important;
+	border: 0 !important;
+	box-shadow: none !important;
+}
+
+/* Os elementos de sombra sao divs vazias que so existiam para tilear o gif;
+   sem imagem viram faixas mortas ocupando espaco. */
+.TableShadowRightTop,
+.TableBottomShadow,
+.TableBottomLeftShadow,
+.TableBottomRightShadow {
+	width: 0 !important;
+	height: 0 !important;
+	font-size: 0 !important;
+	line-height: 0 !important;
+}
+
+/* 2. Container externo vira painel escuro, alinhado com .panel-box do tema. */
+.Table1, .Table2, .Table3, .Table4, .Table5,
+.TableContentContainer,
+.InnerTableContainer {
+	background-image: none !important;
+	background-color: transparent !important;
+	border: 0 !important;
+	width: 100%;
+}
+
+.Table1 > tbody > tr > td,
+.Table2 > tbody > tr > td,
+.Table3 > tbody > tr > td,
+.Table4 > tbody > tr > td,
+.Table5 > tbody > tr > td {
+	padding: 0;
+}
+
+/* 3. A tabela de conteudo em si. */
+.TableContent {
+	background-image: none !important;
+	background-color: var(--bg-dark) !important;
+	border: 1px solid var(--border-metal) !important;
+	border-radius: 6px;
+	overflow: hidden;
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.TableContent > tbody > tr {
+	background-image: none !important;
+	border-bottom: 1px solid rgba(72, 84, 96, 0.35);
+}
+
+.TableContent > tbody > tr:last-child {
+	border-bottom: 0;
+}
+
+.TableContent > tbody > tr:nth-child(even) {
+	background-color: rgba(45, 52, 54, 0.55) !important;
+}
+
+.TableContent > tbody > tr:nth-child(odd) {
+	background-color: rgba(30, 35, 37, 0.55) !important;
+}
+
+.TableContent > tbody > tr > td {
+	padding: 10px 14px;
+	color: var(--text-light);
+	vertical-align: middle;
+}
+
+/* 4. Rotulos de formulario. */
+.LabelV, .LabelH {
+	background-image: none !important;
+	background-color: transparent !important;
+	color: var(--text-muted) !important;
+	font-family: var(--font-body);
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	font-size: 13px;
+	white-space: nowrap;
+}
+
+.LabelV span, .LabelH span {
+	color: inherit !important;
+}
+
+/* 5. Tabela generica do MyAAC (highscores, listagens). O core injeta cores
+      bege via <style> no head; estas regras tem a mesma especificidade mas
+      vem depois, entao vencem. */
+.myaac-table {
+	background-color: var(--bg-dark) !important;
+	border: 1px solid var(--border-metal) !important;
+	border-radius: 6px;
+	overflow: hidden;
+	border-spacing: 0 !important;
+	width: 100%;
+}
+
+.myaac-table > tbody > tr:nth-child(even) { background: rgba(45, 52, 54, 0.55) !important; }
+.myaac-table > tbody > tr:nth-child(odd)  { background: rgba(30, 35, 37, 0.55) !important; }
+
+.myaac-table > thead > tr > td,
+.myaac-table > thead > tr > th,
+.myaac-table > tfoot > tr > td {
+	background: var(--steel-blue) !important;
+	color: #FFFFFF !important;
+	font-family: var(--font-title);
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	padding: 10px 14px !important;
+}
+
+.myaac-table > tbody > tr > td {
+	padding: 9px 14px !important;
+	color: var(--text-light);
+}
+
+/* 6. Controles de formulario. */
+/* input:not([type]) porque o MyAAC emite alguns campos sem atributo type
+   (character_name, por exemplo); sem isto eles ficam com o estilo branco
+   padrao do navegador no meio de um formulario escuro. */
+.TableContent input:not([type]),
+.TableContent input[type="text"],
+.TableContent input[type="password"],
+.TableContent input[type="email"],
+.TableContent input[type="number"],
+.TableContent select,
+.TableContent textarea {
+	background-color: rgba(15, 18, 20, 0.9);
+	border: 1px solid var(--border-metal);
+	border-radius: 4px;
+	color: var(--text-light);
+	font-family: var(--font-body);
+	font-size: 14px;
+	padding: 8px 10px;
+	width: 100%;
+	max-width: 340px;
+	transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.TableContent input:not([type]):focus,
+.TableContent input[type="text"]:focus,
+.TableContent input[type="password"]:focus,
+.TableContent input[type="email"]:focus,
+.TableContent input[type="number"]:focus,
+.TableContent select:focus,
+.TableContent textarea:focus {
+	border-color: var(--steel-blue);
+	box-shadow: 0 0 0 3px var(--steel-blue-glow);
+	outline: none;
+}
+
+.TableContent input[type="radio"],
+.TableContent input[type="checkbox"] {
+	accent-color: var(--steel-blue);
+	margin-right: 6px;
+	vertical-align: middle;
+}
+
+.TableContent label {
+	color: var(--text-light);
+	margin-right: 16px;
+}
+
+/* 7. Mensagens de validacao inline.
+      O MyAAC emite um .FormFieldError vazio para TODO campo, como placeholder
+      que o JS preenche. Estilizar o seletor cru pinta barras vermelhas mortas
+      entre todas as linhas do formulario; so o estado com conteudo pode
+      aparecer. */
+.FormFieldError:not(:empty) {
+	color: var(--scarlet-hover) !important;
+	background: rgba(214, 48, 49, 0.12);
+	border-left: 3px solid var(--scarlet-red);
+	display: block;
+	font-size: 13px;
+	padding: 8px 12px;
+	margin: 4px 0;
+}
+
+.FormFieldError:empty {
+	display: none !important;
+}
+
+/* A <tr> que so contem o placeholder vazio continua ocupando altura. */
+.TableContent > tbody > tr:has(> td > .FormFieldError:empty:only-child),
+.TableContent > tbody > tr:has(> td:empty:first-child + td > .FormFieldError:empty) {
+	display: none;
+}
+
+/* 8. O MyAAC emite <img src=""> em alguns indicadores, o que vira icone de
+      imagem quebrada no navegador. */
+img[src=""],
+img:not([src]) {
+	display: none !important;
+}
+
+.OptionContainer {
+	background-image: none !important;
+	background-color: transparent !important;
+	border: 0 !important;
+	color: var(--text-light);
+}
+
+/* 9. Botoes classicos (.sbutton usa gif de fundo). */
+input[type="submit"],
+input[type="button"],
+.Button input,
+.BigButton {
+	background-image: none !important;
+	background-color: var(--steel-blue) !important;
+	border: 0 !important;
+	border-radius: 4px;
+	color: #FFFFFF !important;
+	cursor: pointer;
+	font-family: var(--font-title);
+	font-size: 14px;
+	font-weight: 700;
+	letter-spacing: 0.05em;
+	padding: 9px 20px;
+	text-transform: uppercase;
+	transition: background-color 0.15s ease;
+}
+
+input[type="submit"]:hover,
+input[type="button"]:hover,
+.Button input:hover,
+.BigButton:hover {
+	background-color: var(--steel-hover) !important;
+}
+
+/* 10. Tabelas do MyAAC nao sao responsivas; em telas estreitas elas forcavam
+       scroll horizontal na pagina inteira. */
+@media (max-width: 720px) {
+	.TableContent,
+	.myaac-table {
+		display: block;
+		overflow-x: auto;
+	}
+
+	.LabelV, .LabelH {
+		white-space: normal;
+		width: auto !important;
+	}
+}
+
+/* --------------------------------------------------------------------------
+   Ritmo do formulario
+   O MyAAC aninha <table width="100%"> dentro das celulas para agrupar radios,
+   o que quebra o alinhamento e joga a ultima opcao para a linha de baixo.
+   -------------------------------------------------------------------------- */
+
+.TableContent table {
+	background: transparent !important;
+	border: 0 !important;
+	width: 100%;
+}
+
+.TableContent table td {
+	padding: 0 !important;
+	border: 0 !important;
+}
+
+/* Grupos de radio (sexo, vocacao) como linha que quebra por inteiro. */
+.TableContent table td:has(> .OptionContainer),
+td:has(> .OptionContainer) {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px 22px;
+	align-items: center;
+}
+
+.OptionContainer {
+	align-items: center;
+	display: inline-flex;
+	gap: 6px;
+	margin-right: 0 !important;
+	white-space: nowrap;
+}
+
+.OptionContainer label {
+	cursor: pointer;
+	margin: 0 !important;
+	text-transform: capitalize;
+}
+
+/* Coluna de rotulo com largura estavel; o MyAAC fixa 150px inline em alguns
+   campos e deixa outros soltos, o que desalinha as linhas entre si. */
+.TableContent > tbody > tr > td.LabelV {
+	width: 190px !important;
+	padding-right: 18px;
+}
+
+/* Respiro entre os dois blocos (conta e personagem). */
+.Table1, .Table2, .Table3, .Table4, .Table5 {
+	margin-bottom: 22px;
+}
+
+/* Caixa de aceite dos termos. */
+#accept_rules {
+	margin-right: 8px;
+}
+
+.TableContent a {
+	color: var(--steel-hover);
+	text-decoration: none;
+}
+
+.TableContent a:hover {
+	text-decoration: underline;
+}
