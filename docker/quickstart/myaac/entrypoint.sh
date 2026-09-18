@@ -35,12 +35,16 @@ require_uint "CANARY_STATUS_PORT" "$CANARY_STATUS_PORT"
 require_uint "CANARY_STATUS_TIMEOUT" "$CANARY_STATUS_TIMEOUT"
 
 mkdir -p /canary/data/XML
+# statusProtocolPort sai entre aspas de proposito. O system/status.php do MyAAC
+# testa a porta com isset($status_port[0]), que so e verdadeiro para string;
+# com inteiro o teste falha e ele cai no fallback fixo 7171, deixando o site
+# permanentemente "offline". As demais portas nao passam por esse teste.
 cat > /canary/config.lua <<EOF
 serverName = "$(escape_lua "$CANARY_SERVER_NAME")"
 ip = "$(escape_lua "$CANARY_SERVER_IP")"
 loginProtocolPort = ${CANARY_LOGIN_PORT}
 gameProtocolPort = ${CANARY_GAME_PORT}
-statusProtocolPort = ${CANARY_STATUS_PORT}
+statusProtocolPort = "${CANARY_STATUS_PORT}"
 statusTimeout = ${CANARY_STATUS_TIMEOUT}
 worldType = "pvp"
 dataPackDirectory = "$(escape_lua "$CANARY_DATA_PACK")"

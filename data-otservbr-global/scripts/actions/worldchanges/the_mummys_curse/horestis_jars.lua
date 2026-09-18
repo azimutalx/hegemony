@@ -32,7 +32,7 @@ function horestisJars.onUse(cid, item, fromPosition, itemEx, toPosition)
 					setPlayerStorageValue(cid, Storage.TheMummysCurse.Time1, os.time() + exaustedSeconds * 1800)
 				end
 			else
-				doPlayerSendCancel(cid, "You need wait 30 minutes to use again.")
+				player:sendCancelMessage("You need wait 30 minutes to use again.")
 			end
 		end
 	elseif item.actionid == 50007 then
@@ -48,10 +48,10 @@ function horestisJars.onUse(cid, item, fromPosition, itemEx, toPosition)
 						setPlayerStorageValue(cid, Storage.TheMummysCurse.Time2, os.time() + exaustedSeconds * 1800)
 					end
 				else
-					doPlayerSendCancel(cid, "You need wait 30 minutes to use again.")
+					player:sendCancelMessage("You need wait 30 minutes to use again.")
 				end
 			else
-				doPlayerSendCancel(cid, "You need to break the first jar.")
+				player:sendCancelMessage("You need to break the first jar.")
 			end
 		end
 	elseif item.actionid == 50008 then
@@ -67,10 +67,10 @@ function horestisJars.onUse(cid, item, fromPosition, itemEx, toPosition)
 						setPlayerStorageValue(cid, Storage.TheMummysCurse.Time3, os.time() + exaustedSeconds * 1800)
 					end
 				else
-					doPlayerSendCancel(cid, "You need wait 30 minutes to use again.")
+					player:sendCancelMessage("You need wait 30 minutes to use again.")
 				end
 			else
-				doPlayerSendCancel(cid, "You need to break the second jar.")
+				player:sendCancelMessage("You need to break the second jar.")
 			end
 		end
 	elseif item.actionid == 50009 then
@@ -86,10 +86,10 @@ function horestisJars.onUse(cid, item, fromPosition, itemEx, toPosition)
 						setPlayerStorageValue(cid, Storage.TheMummysCurse.Time4, os.time() + exaustedSeconds * 1800)
 					end
 				else
-					doPlayerSendCancel(cid, "You need wait 30 minutes to use again.")
+					player:sendCancelMessage("You need wait 30 minutes to use again.")
 				end
 			else
-				doPlayerSendCancel(cid, "You need to break the third jar.")
+				player:sendCancelMessage("You need to break the third jar.")
 			end
 		end
 	elseif item.actionid == 50010 then
@@ -111,7 +111,7 @@ function horestisJars.onUse(cid, item, fromPosition, itemEx, toPosition)
 				addEvent(Game.createItem, 20 * 60 * 1000, 3514, { x = 32943, y = 32754, z = 12 })
 				addEvent(Game.createItem, 20 * 60 * 1000, 3514, { x = 32944, y = 32754, z = 12 })
 			else
-				doPlayerSendCancel(cid, "You need to break the fourth jar.")
+				player:sendCancelMessage("You need to break the fourth jar.")
 			end
 		end
 	end

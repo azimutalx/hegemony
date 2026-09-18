@@ -199,6 +199,7 @@ else
 		echo "Creating test accounts..."
 		mysql_cmd -D "$CANARY_DB_NAME" </canary/01-test_account.sql
 		mysql_cmd -D "$CANARY_DB_NAME" </canary/02-test_account_players.sql
+		mysql_cmd -D "$CANARY_DB_NAME" </canary/03-admin_accounts.sql
 	else
 		echo "Test account creation skipped"
 	fi

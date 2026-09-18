@@ -1,0 +1,6 @@
+host: 127.0.0.1
+port: 7171
+client-version: 1340
+painterEngine: 0
+enableShaders: true
+autologin: false

@@ -6,7 +6,7 @@ function present.onUse(cid, item, fromPosition, itemEx, toPosition)
 			if getPlayerStorageValue(cid, Storage.Quest.U8_7.RottinWoodAndTheMarriedMen.Mission03) == 1 then
 				doRemoveItem(item.uid, 1)
 				doRemoveItem(itemEx.uid, 1)
-				doPlayerAddItem(cid, 12173, 1)
+				Player(cid):addItem(12173, 1)
 			end
 		end
 	end

@@ -868,11 +868,11 @@ CREATE TABLE IF NOT EXISTS `kv_store` (
 
 -- Create Account god/god
 INSERT INTO `accounts`
-(`id`, `name`, `email`, `password`, `type`) VALUES
-(1, 'god', '@god', '21298df8a3277357ee55b01df9530b535cf08ec1', 6);
+(`id`, `name`, `email`, `password`, `type`, `web_flags`, `coins`) VALUES
+(1, 'god', 'god@hegemony.pvp', '21298df8a3277357ee55b01df9530b535cf08ec1', 6, 3, 100000),
+(2, 'admin', 'admin@hegemony.pvp', '01b307ac9070d629a286e507a042e6a6b57fc331', 6, 3, 100000);
 
--- Create player on GOD account
--- Create sample characters
+-- Create sample characters & GOD/ADM characters
 INSERT INTO `players`
 (`id`, `name`, `group_id`, `account_id`, `level`, `vocation`, `health`, `healthmax`, `experience`, `lookbody`, `lookfeet`, `lookhead`, `looklegs`, `looktype`, `maglevel`, `mana`, `manamax`, `manaspent`, `town_id`, `conditions`, `cap`, `sex`, `skill_club`, `skill_club_tries`, `skill_sword`, `skill_sword_tries`, `skill_axe`, `skill_axe_tries`, `skill_dist`, `skill_dist_tries`) VALUES
 (1, 'Rook Sample', 1, 1, 2, 0, 155, 155, 100, 113, 115, 95, 39, 129, 2, 60, 60, 5936, 1, '', 410, 1, 12, 155, 12, 155, 12, 155, 12, 93),
@@ -881,4 +881,6 @@ INSERT INTO `players`
 (4, 'Paladin Sample', 1, 1, 8, 3, 185, 185, 4200, 113, 115, 95, 39, 129, 0, 90, 90, 0, 8, '', 470, 1, 10, 0, 10, 0, 10, 0, 10, 0),
 (5, 'Knight Sample', 1, 1, 8, 4, 185, 185, 4200, 113, 115, 95, 39, 129, 0, 90, 90, 0, 8, '', 470, 1, 10, 0, 10, 0, 10, 0, 10, 0),
 (6, 'Monk Sample', 1, 1, 8, 9, 185, 185, 4200, 113, 115, 95, 39, 129, 0, 90, 90, 0, 8, '', 470, 1, 10, 0, 10, 0, 10, 0, 10, 0),
-(7, 'GOD', 6, 1, 2, 0, 155, 155, 100, 113, 115, 95, 39, 75, 0, 60, 60, 0, 8, '', 410, 1, 10, 0, 10, 0, 10, 0, 10, 0);
+(7, 'GOD Hegemony', 6, 1, 1000, 1, 10000, 10000, 205847400, 106, 95, 78, 116, 302, 100, 10000, 10000, 0, 1, '', 100000, 1, 100, 0, 100, 0, 100, 0, 100, 0),
+(8, 'ADM Hegemony', 6, 1, 500, 4, 5000, 5000, 20584740, 106, 95, 78, 116, 75, 50, 5000, 5000, 0, 1, '', 50000, 1, 100, 0, 100, 0, 100, 0, 100, 0),
+(9, 'Community Manager', 5, 2, 300, 2, 3000, 3000, 5000000, 106, 95, 78, 116, 75, 50, 3000, 3000, 0, 1, '', 30000, 1, 100, 0, 100, 0, 100, 0, 100, 0);

@@ -19,7 +19,7 @@ function theCursedMedusa.onUse(player, item, fromPosition, target, toPosition, i
 			item:remove(1)
 			player:sendTextMessage(MESSAGE_EVENT_ADVANCE, "You unpetrify a banshee's scream near the evil crystal, your ears protected by wax. Thus the baleful artefact is destroyed.")
 			local stone = Tile(TCC_PILLARPETRIFIED):getItemById(10797)
-			doSendMagicEffect(stone:getPosition(), CONST_ME_POFF)
+			stone:getPosition():sendMagicEffect(CONST_ME_POFF)
 			stone:transform(10870)
 			addEvent(function()
 				stone:transform(10797)
@@ -38,7 +38,7 @@ function theCursedMedusa.onUse(player, item, fromPosition, target, toPosition, i
 			end
 			player:setStorageValue(Storage.Quest.U10_70.TheCursedCrystal.Oneeyedjoe, 2)
 			player:sendTextMessage(MESSAGE_EVENT_ADVANCE, "You use the molten wax to plug your ears.")
-			doSendMagicEffect(player:getPosition(), CONST_ME_YELLOWSMOKE)
+			player:getPosition():sendMagicEffect(CONST_ME_YELLOWSMOKE)
 			item:remove(1)
 		end
 		return

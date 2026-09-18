@@ -50,7 +50,7 @@ function bigfootWarzoneCrystal.onUse(player, item, fromPosition, itemEx, toPosit
 		addEvent(warzoneConfig.resetRoom, 30 * 60 * 1000, config, "You were teleported out by the gnomish emergency device.", true)
 		addEvent(Game.setStorageValue, 30 * 60 * 1000, 96974, 0)
 	else
-		doPlayerSendCancel(player, "Wait 30 minutes to start again.")
+		player:sendCancelMessage("Wait 30 minutes to start again.")
 	end
 	return true
 end

@@ -8,7 +8,7 @@ function playerLogin.onLogin(player)
 	if not player:isPremium() and not table.contains(freeTowns, player:getTown():getName()) then
 		local town = player:getTown()
 		local sex = player:getSex()
-		local home = getHouseByPlayerGUID(getPlayerGUID(player))
+		local home = getHouseByPlayerGUID(player:getGuid())
 		town = table.contains(freeTowns, town:getName()) and town or Town(defaultTown)
 		player:teleportTo(town:getTemplePosition())
 		player:setTown(town)

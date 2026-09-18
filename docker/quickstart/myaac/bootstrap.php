@@ -163,6 +163,7 @@ function write_myaac_config(): void
 
 	$config = [
 		'env' => 'prod',
+		'template' => 'hegemony',
 		'server_path' => $serverPath,
 		'site_url' => rtrim(env_value('MYAAC_SITE_URL', 'http://localhost:8080'), '/') . '/',
 		'database_overwrite' => true,
@@ -366,6 +367,10 @@ function finish_myaac_install(PDO $pdo): void
 	$settings->updateInDatabase('core', 'anonymous_usage_statistics', 'false');
 	$settings->updateInDatabase('core', 'date_timezone', env_value('MYAAC_TIMEZONE', 'America/Fortaleza'));
 	$settings->updateInDatabase('core', 'client', env_value('MYAAC_CLIENT_VERSION', '1513'));
+	// O tema ativo vem de setting('core.template') em system/template.php,
+	// nao de $config['template']. Sem esta linha o MyAAC cai no tema padrao
+	// mesmo com o template proprio presente e configurado.
+	$settings->updateInDatabase('core', 'template', env_value('MYAAC_TEMPLATE', 'hegemony'));
 
 	$statement = $pdo->prepare(
 		'INSERT INTO myaac_config (`name`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`)'

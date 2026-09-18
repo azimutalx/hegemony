@@ -1,0 +1,38 @@
+Panel
+  id: background
+  image-source: /client_background/background
+  image-smooth: true
+  anchors.top: parent.top
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.bottom: parent.bottom
+  focusable: false
+
+  UIWidget
+    id: blurOverlay
+    anchors.fill: parent
+    background-color: #0b0e14c0
+    opacity: 0.88
+    focusable: false
+
+  UIWidget
+    id: glassVignette
+    anchors.fill: parent
+    background-color: #00000055
+    focusable: false
+
+  UILabel
+    id: clientVersionLabel
+    background-color: #1e2325dd
+    border: 1 #0984e366
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    text-align: center
+    text-auto-resize: true
+    width: 240
+    padding: 6
+    margin-right: 12
+    margin-bottom: 12
+    color: #dfe6e9
+    font: verdana-11px-monochrome
+    !text: 'Hegemony PvP - Tactical War MMORPG'

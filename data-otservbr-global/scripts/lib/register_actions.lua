@@ -1165,7 +1165,7 @@ function onGrindItem(player, item, fromPosition, target, toPosition)
 				if not parent:isTile() and (parent:addItem(value.item_id, 1) or topParent:addItem(value.item_id, 1)) then
 					item:remove(1)
 					player:sendTextMessage(MESSAGE_EVENT_ADVANCE, "You grind a " .. ItemType(index):getName() .. " into fine, " .. ItemType(value.item_id):getName() .. ".")
-					doSendMagicEffect(target:getPosition(), value.effect)
+					target:getPosition():sendMagicEffect(value.effect)
 					return true
 				else
 					Game.createItem(value.item_id, 1, item:getPosition())
@@ -1175,7 +1175,7 @@ function onGrindItem(player, item, fromPosition, target, toPosition)
 			end
 			player:sendTextMessage(MESSAGE_EVENT_ADVANCE, "You grind a " .. ItemType(index):getName() .. " into fine, " .. ItemType(value.item_id):getName() .. ".")
 			item:remove(1)
-			doSendMagicEffect(target:getPosition(), value.effect)
+			target:getPosition():sendMagicEffect(value.effect)
 			return
 		end
 	end

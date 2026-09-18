@@ -1,0 +1,4 @@
+Panel
+  id: bottomMenu
+  size: 0 0
+  visible: false
