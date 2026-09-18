@@ -36,7 +36,7 @@ INSERT INTO `myaac_news` (`title`, `body`, `type`, `date`, `category`, `player_i
 1, UNIX_TIMESTAMP() - 60, 1, 0, 0, 0, '', '', '', 0),
 
 ('Venore em guerra',
-'<p>O Hegemony é PvP puro dentro de <b>Venore</b>: a cidade inteira, todos os andares, e nenhuma saída. Todo mundo começa no mesmo ponto e a diferença está no que você tira dos outros.</p>
+'<p>O Hegemony é PvP puro dentro de <b>Venore</b>: a cidade do térreo para cima, sem esgoto e sem nenhuma saída. Todo mundo começa no mesmo ponto e a diferença está no que você tira dos outros.</p>
 <h3>Todo mundo nasce igual</h3>
 <ul>
 <li>Sua conta é premium e já vem com <b>cinco personagens nível 80</b>: Master Sorcerer, Elder Druid, Royal Paladin e dois Elite Knights, um com Magic Sword e escudo, outro com a Avenger.</li>
@@ -80,7 +80,7 @@ WHERE `name` = 'downloads';
 UPDATE `myaac_pages` SET `title` = 'Regras', `enable_tinymce` = 0, `body` =
 '<h3>O mundo</h3>
 <ul>
-<li>O mapa é <b>Venore</b> inteira: ruas, prédios, esgoto e todos os andares. As escadas que desciam para o pântano foram fechadas e não há barco nem carruagem.</li>
+<li>O mapa é <b>Venore</b> do térreo para cima: ruas, prédios e telhados. As escadas que desciam para o pântano e para o esgoto foram fechadas, e não há barco nem carruagem.</li>
 <li>PvP livre: qualquer um ataca qualquer um fora das áreas protegidas (templo e depósito).</li>
 </ul>
 <h3>Personagens</h3>
@@ -98,6 +98,7 @@ UPDATE `myaac_pages` SET `title` = 'Regras', `enable_tinymce` = 0, `body` =
 <tr><td>Elite Knight (escudo)</td><td>Zaoan Helmet, Zaoan Armor, Zaoan Legs, Magic Sword, Shield of Corruption, Boots of Haste</td></tr>
 <tr><td>Elite Knight (Avenger)</td><td>Zaoan Helmet, Zaoan Armor, Zaoan Legs, The Avenger, Boots of Haste</td></tr>
 </table>
+<p>Na mochila, infinitas: Magic Wall, Disintegrate, Destroy Field e Fire Bomb para todos; Sudden Death para os magos; Paralyse e Wild Growth para o Elder Druid; e as poções da vocação.</p>
 <h3>Matar, morrer e sair</h3>
 <ul>
 <li>Matar outro jogador dá experiência.</li>

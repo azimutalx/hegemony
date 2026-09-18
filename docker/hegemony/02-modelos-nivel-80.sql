@@ -21,6 +21,7 @@
 --   nivel 80 como ponto de partida — evolui normalmente depois
 --   vocacoes promovidas: MS, ED, RP, EK (sem Monk)
 --   skills de personagem treinado tipico do 80
+--   (18/09, depois do primeiro teste: magos ML 50 e RP distance 85)
 --   kit: ver scripts/hegemony/renascer.lua (18/09: equipamento por vocacao
 --        definido com o usuario, mais as runas e pocoes infinitas)
 --   suprimentos infinitos: ver docker/hegemony/entrypoint.sh
@@ -40,7 +41,7 @@
 UPDATE `players` SET
 	`vocation` = 5, `level` = 80, `experience` = 7915800,
 	`health` = 545, `healthmax` = 545, `mana` = 2250, `manamax` = 2250,
-	`cap` = 1190, `soul` = 200, `maglevel` = 75, `manaspent` = 0,
+	`cap` = 1190, `soul` = 200, `maglevel` = 50, `manaspent` = 0,
 	`skill_fist` = 10, `skill_fist_tries` = 0, `skill_club` = 10, `skill_club_tries` = 0,
 	`skill_sword` = 10, `skill_sword_tries` = 0, `skill_axe` = 10, `skill_axe_tries` = 0,
 	`skill_dist` = 10, `skill_dist_tries` = 0, `skill_shielding` = 25, `skill_shielding_tries` = 0,
@@ -50,7 +51,7 @@ WHERE `name` = 'Sorcerer Sample';
 UPDATE `players` SET
 	`vocation` = 6, `level` = 80, `experience` = 7915800,
 	`health` = 545, `healthmax` = 545, `mana` = 2250, `manamax` = 2250,
-	`cap` = 1190, `soul` = 200, `maglevel` = 70, `manaspent` = 0,
+	`cap` = 1190, `soul` = 200, `maglevel` = 50, `manaspent` = 0,
 	`skill_fist` = 10, `skill_fist_tries` = 0, `skill_club` = 10, `skill_club_tries` = 0,
 	`skill_sword` = 10, `skill_sword_tries` = 0, `skill_axe` = 10, `skill_axe_tries` = 0,
 	`skill_dist` = 10, `skill_dist_tries` = 0, `skill_shielding` = 25, `skill_shielding_tries` = 0,
@@ -63,7 +64,7 @@ UPDATE `players` SET
 	`cap` = 1910, `soul` = 200, `maglevel` = 22, `manaspent` = 0,
 	`skill_fist` = 10, `skill_fist_tries` = 0, `skill_club` = 10, `skill_club_tries` = 0,
 	`skill_sword` = 10, `skill_sword_tries` = 0, `skill_axe` = 10, `skill_axe_tries` = 0,
-	`skill_dist` = 95, `skill_dist_tries` = 0, `skill_shielding` = 75, `skill_shielding_tries` = 0,
+	`skill_dist` = 85, `skill_dist_tries` = 0, `skill_shielding` = 75, `skill_shielding_tries` = 0,
 	`skill_fishing` = 10, `skill_fishing_tries` = 0
 WHERE `name` = 'Paladin Sample';
 

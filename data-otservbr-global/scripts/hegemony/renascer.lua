@@ -62,7 +62,7 @@ end
 -- Os precos do receptador fazem cada kit somar 10.000 (ver receptador.lua).
 local MOLDES = {
 	[5] = { -- Master Sorcerer
-		vida = 545, mana = 2250, cap = 1190, ml = 75,
+		vida = 545, mana = 2250, cap = 1190, ml = 50,
 		skills = { [SKILL_SHIELD] = 25 },
 		slots = {
 			[CONST_SLOT_HEAD] = 8864, -- yalahari mask (nivel 80; o zaoan helmet nao serve em mago)
@@ -72,10 +72,10 @@ local MOLDES = {
 			[CONST_SLOT_RIGHT] = 8075, -- spellbook of lost souls (nivel 60, a maior defesa ate o 80)
 			[CONST_SLOT_FEET] = 3079, -- boots of haste
 		},
-		mochila = comRunas({ { 238, 1 }, { 266, 1 } }), -- great mana, health potion
+		mochila = comRunas({ { 3155, 3 }, { 238, 1 }, { 266, 1 } }), -- sudden death, great mana, health potion
 	},
 	[6] = { -- Elder Druid
-		vida = 545, mana = 2250, cap = 1190, ml = 70,
+		vida = 545, mana = 2250, cap = 1190, ml = 50,
 		skills = { [SKILL_SHIELD] = 25 },
 		slots = {
 			[CONST_SLOT_HEAD] = 8864,
@@ -85,11 +85,12 @@ local MOLDES = {
 			[CONST_SLOT_RIGHT] = 8075,
 			[CONST_SLOT_FEET] = 3079,
 		},
-		mochila = comRunas({ { 3156, 2 }, { 238, 1 }, { 266, 1 } }), -- wild growth, pocoes
+		-- paralyse rune e so de druida (data/scripts/runes/paralyze_rune.lua)
+		mochila = comRunas({ { 3155, 3 }, { 3165, 1 }, { 3156, 2 }, { 238, 1 }, { 266, 1 } }), -- sudden death, paralyse, wild growth, pocoes
 	},
 	[7] = { -- Royal Paladin: a Ironworker e de duas maos
 		vida = 905, mana = 1170, cap = 1910, ml = 22,
-		skills = { [SKILL_DISTANCE] = 95, [SKILL_SHIELD] = 75 },
+		skills = { [SKILL_DISTANCE] = 85, [SKILL_SHIELD] = 75 },
 		slots = {
 			[CONST_SLOT_HEAD] = 10385, -- zaoan helmet
 			[CONST_SLOT_ARMOR] = 8063, -- paladin armor
@@ -205,6 +206,21 @@ function Hegemony.voltarAoMolde(player)
 	return true
 end
 
+-- Suprimento que falta na mochila volta no login: runa e pocao sao infinitas,
+-- entao repor nao da vantagem, e personagem criado antes de uma runa entrar
+-- no kit (a SD e a paralyse entraram em 18/09) recebe sem precisar morrer.
+local function completarSuprimentos(player, m)
+	local mochila = player:getSlotItem(CONST_SLOT_BACKPACK)
+	if not mochila or not mochila:isContainer() then
+		return
+	end
+	for _, e in ipairs(m.mochila) do
+		if player:getItemCount(e[1]) == 0 then
+			mochila:addItem(e[1], e[2])
+		end
+	end
+end
+
 -- Molde + kit novo: o que roda depois de morrer e no primeiro login.
 function Hegemony.renascer(player)
 	local m = molde(player)
@@ -265,6 +281,10 @@ function entrada.onLogin(player)
 		-- quando o servidor derruba a conexao).
 		kv(player):set(KV_NASCEU, true)
 		Hegemony.voltarAoMolde(player)
+		local m = molde(player)
+		if m then
+			completarSuprimentos(player, m)
+		end
 	end
 	return true
 end

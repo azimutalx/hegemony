@@ -1,4 +1,4 @@
--- Hegemony PvP: o mundo e so Venore, a cidade inteira, todos os andares.
+-- Hegemony PvP: o mundo e so Venore, do andar 7 para cima (sem o esgoto).
 --
 -- COMO A CIDADE FOI MEDIDA (18/09/2026)
 --
@@ -14,11 +14,18 @@
 --     pantano ou para o continente. Sem elas, nada do que se alcanca sai do
 --     retangulo abaixo, em andar nenhum.
 --
--- As 6 escadas viram o piso vizinho a cada boot (o mapa nao e salvo, so as
--- casas). A zona e a rede de seguranca para o resto: levitate, teleporte de
--- script (pedra dos aventureiros, Fury Gate, santuarios), barco. Barcos e
--- carruagem nem existem: os NPCs de Venore sairam do spawn (ver
--- world/otservbr-npc.xml e o compose).
+-- O SUBSOLO FECHADO (18/09/2026, pedido do usuario)
+--
+-- A mesma busca, parando no andar 7, deu 4.368 tiles do andar 2 ao 7 e
+-- exatamente 4 descidas para o esgoto (920 tiles nos andares 8 a 11, sem
+-- depot nem NPC): 3 escadas e 1 alcapao, todos no andar 7. Levitate nao
+-- desce do 7 para o 8 (regra da propria magia).
+--
+-- As 10 passagens viram o piso vizinho a cada boot (o mapa nao e salvo, so as
+-- casas). A zona, que vai so ate o andar 7, e a rede de seguranca para o
+-- resto: teleporte de script (pedra dos aventureiros, Fury Gate, santuarios),
+-- barco. Barcos e carruagem nem existem: os NPCs de Venore sairam do spawn
+-- (ver world/otservbr-npc.xml e o compose).
 
 Hegemony = Hegemony or {}
 
@@ -26,18 +33,24 @@ Hegemony.VENORE = {
 	cidade = 9, -- TOWNS_LIST.VENORE
 	templo = Position(32957, 32076, 7),
 	de = Position(32855, 32005, 0),
-	ate = Position(33030, 32165, 15),
+	ate = Position(33030, 32165, 7),
 }
 
 -- escada = id do chao que hoje e a escada; piso = chao mais comum entre os
 -- vizinhos andaveis do mesmo andar, conferido no .otbm.
-local ESCADAS_DE_SAIDA = {
+local ESCADAS_FECHADAS = {
+	-- saidas da cidade
 	{ pos = Position(32862, 32126, 6), escada = 413, piso = 17464 }, -- stairs -> cobblestone
 	{ pos = Position(32867, 32032, 6), escada = 484, piso = 16484 }, -- trapdoor -> grimy wooden plank
 	{ pos = Position(32888, 32056, 6), escada = 4826, piso = 17468 }, -- stairs -> cobblestone
 	{ pos = Position(32907, 32028, 6), escada = 434, piso = 16484 }, -- trapdoor -> grimy wooden plank
 	{ pos = Position(32936, 32159, 6), escada = 413, piso = 17464 }, -- stairs -> cobblestone
 	{ pos = Position(32965, 32110, 6), escada = 4826, piso = 17505 }, -- stairs -> plaster
+	-- descidas para o esgoto
+	{ pos = Position(32908, 32074, 7), escada = 414, piso = 417 }, -- stairs -> tiled floor
+	{ pos = Position(32931, 32077, 7), escada = 414, piso = 417 }, -- stairs -> tiled floor
+	{ pos = Position(32936, 32080, 7), escada = 412, piso = 15043 }, -- trapdoor -> mossy floor
+	{ pos = Position(33021, 32059, 7), escada = 414, piso = 417 }, -- stairs -> tiled floor
 }
 
 local zona = Zone("hegemony.venore")
@@ -61,11 +74,11 @@ end
 local fechar = GlobalEvent("HegemonyFecharVenore")
 function fechar.onStartup()
 	local fechadas = 0
-	for _, e in ipairs(ESCADAS_DE_SAIDA) do
+	for _, e in ipairs(ESCADAS_FECHADAS) do
 		local tile = Tile(e.pos)
 		local chao = tile and tile:getGround()
 		if not chao then
-			logger.error("[Hegemony] sem chao em {}: escada de saida continua aberta", texto(e.pos))
+			logger.error("[Hegemony] sem chao em {}: escada continua aberta", texto(e.pos))
 		elseif chao:getId() ~= e.escada then
 			-- Mapa diferente do medido. Nao troca as cegas: registra alto.
 			logger.error("[Hegemony] esperava a escada {} em {} e achei {}; nao troquei", e.escada, texto(e.pos), chao:getId())
@@ -78,7 +91,7 @@ function fechar.onStartup()
 			end
 		end
 	end
-	logger.info("[Hegemony] Venore fechada: {} de {} escadas de saida viraram piso", fechadas, #ESCADAS_DE_SAIDA)
+	logger.info("[Hegemony] Venore fechada: {} de {} escadas viraram piso", fechadas, #ESCADAS_FECHADAS)
 	return true
 end
 fechar:register()
@@ -96,9 +109,9 @@ function borda.beforeLeave(zone, creature)
 end
 borda:register()
 
--- Quem entra fora de Venore (personagem antigo, ou salvo em outra cidade) vai
--- para o templo. A cidade natal vira Venore para todos, porque e para o templo
--- dela que o motor manda quem morre.
+-- Quem entra fora de Venore (personagem antigo, salvo em outra cidade ou no
+-- esgoto, antes de ele fechar) vai para o templo. A cidade natal vira Venore
+-- para todos, porque e para o templo dela que o motor manda quem morre.
 local chegada = CreatureEvent("HegemonyChegadaVenore")
 function chegada.onLogin(player)
 	if Hegemony.livre(player) then
