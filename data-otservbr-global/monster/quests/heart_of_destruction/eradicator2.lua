@@ -26,10 +26,20 @@ monster.changeTarget = {
 	chance = 25,
 }
 
-monster.bosstiary = {
-	bossRaceId = 1225,
-	bossRace = RARITY_ARCHFOE,
-}
+-- Sem entrada de bosstiary de proposito.
+--
+-- Este arquivo e a segunda forma do Eradicator, criada pelo
+-- creaturescripts_eradicator_transform.lua. O boss de verdade e o
+-- eradicator.lua, registrado com bossRaceId 1226.
+--
+-- Enquanto os dois estavam no bosstiary como RARITY_ARCHFOE, os dois eram
+-- elegiveis a boss do dia — e `IOBosstiary::loadBoostedBoss` publica a CHAVE de
+-- registro, nao `monster.name`. Quando o 1225 era sorteado, todo jogador via
+-- "Today's boosted boss: Eradicator2" ao entrar. Observado no jogo em
+-- 18/09/2026; de 105 archfoes, este era o unico com chave feia.
+--
+-- Tirar o bloco remove a entrada duplicada e deixa um unico Eradicator no
+-- bosstiary, que e o correto. A transformacao da quest nao usa bosstiary.
 
 monster.strategiesTarget = {
 	nearest = 70,

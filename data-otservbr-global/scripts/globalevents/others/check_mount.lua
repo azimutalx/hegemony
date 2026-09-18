@@ -7,25 +7,30 @@ function rentedMounts.onThink(interval)
 		return true
 	end
 
-	local player, outfit
+	local player, outfit, expiraEm
 	for i = 1, #players do
 		player = players[i]
-		if player:getStorageValue(Storage.Quest.U9_1.HorseStationWorldChange.Timer) < 1 or player:getStorageValue(Storage.Quest.U9_1.HorseStationWorldChange.Timer) >= os.time() then
-			break
-		end
+		expiraEm = player:getStorageValue(Storage.Quest.U9_1.HorseStationWorldChange.Timer)
 
-		outfit = player:getOutfit()
-		if table.contains(mountIds, outfit.lookMount) then
-			outfit.lookMount = nil
-			player:setOutfit(outfit)
-		end
+		-- A condicao esta invertida de proposito. Antes havia um `break` quando
+		-- o aluguel NAO tinha vencido, o que abandonava o laco no primeiro
+		-- jogador sem cavalo alugado — o caso comum, storage < 1. Efeito: com
+		-- qualquer jogador assim na frente da lista, aluguel nenhum expirava.
+		-- Lua nao tem `continue`, entao a correcao e processar so quem venceu.
+		if expiraEm >= 1 and expiraEm < os.time() then
+			outfit = player:getOutfit()
+			if table.contains(mountIds, outfit.lookMount) then
+				outfit.lookMount = nil
+				player:setOutfit(outfit)
+			end
 
-		for m = 1, #mountIds do
-			player:removeMount(mountIds[m])
-		end
+			for m = 1, #mountIds do
+				player:removeMount(mountIds[m])
+			end
 
-		player:setStorageValue(Storage.Quest.U9_1.HorseStationWorldChange.Timer, -1)
-		player:sendTextMessage(MESSAGE_EVENT_ADVANCE, "Your contract with your horse expired and it returned back to the horse station.")
+			player:setStorageValue(Storage.Quest.U9_1.HorseStationWorldChange.Timer, -1)
+			player:sendTextMessage(MESSAGE_EVENT_ADVANCE, "Your contract with your horse expired and it returned back to the horse station.")
+		end
 	end
 	return true
 end

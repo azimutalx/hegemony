@@ -4,11 +4,15 @@ services:
   db:
     image: mariadb:11.4
     restart: unless-stopped
+    # Sem teto, qualquer container pode consumir a maquina inteira do operador.
+    mem_limit: 1g
+    cpus: 2
     environment:
       MARIADB_DATABASE: "${CANARY_DB_NAME:-canary}"
       MARIADB_USER: "${CANARY_DB_USER:-canary}"
       MARIADB_PASSWORD: "${CANARY_DB_PASSWORD:-canary}"
       MARIADB_ROOT_PASSWORD: "${CANARY_DB_ROOT_PASSWORD:-root}"
+      TZ: "${CANARY_TIMEZONE:-America/Fortaleza}"
     networks:
       - canary-net
     volumes:
@@ -22,7 +26,16 @@ services:
   server:
     image: "${CANARY_IMAGE:-ghcr.io/opentibiabr/canary:latest}"
     restart: unless-stopped
+    mem_limit: 4g
+    cpus: 6
+    # Entrypoint proprio: aplica a configuracao do Hegemony que o start.sh da
+    # imagem nao cobre, e so entao chama o start.sh. Ver o cabecalho do script.
+    entrypoint: ["/bin/bash", "/hegemony/entrypoint.sh"]
     environment:
+      # O servidor calcula "hoje" com localtime(). Sem TZ o container roda em
+      # UTC: a criatura e o boss do dia trocavam as 21h de Brasilia, e a
+      # "ultima visita" aparecia 3 horas adiantada para o jogador.
+      TZ: "${CANARY_TIMEZONE:-America/Fortaleza}"
       CANARY_DB_HOST: "${CANARY_DB_HOST:-db}"
       CANARY_DB_PORT: "${CANARY_DB_PORT:-3306}"
       CANARY_DB_NAME: "${CANARY_DB_NAME:-canary}"
@@ -63,6 +76,15 @@ services:
       - '${CANARY_STATUS_PORT:-7173}:${CANARY_STATUS_PORT:-7173}'
     volumes:
       - 'server-data:/data'
+      - './hegemony/entrypoint.sh:/hegemony/entrypoint.sh:ro'
+      # Duas correcoes pontuais do datapack, montadas arquivo a arquivo.
+      #
+      # O datapack inteiro nao e montado de proposito: o mapa de 190 MB e
+      # baixado pelo start.sh para dentro de data-otservbr-global/world/, entao
+      # montar a pasta do repo faria o servidor rebaixar o mapa para dentro do
+      # git a cada container novo.
+      - '../data-otservbr-global/monster/quests/heart_of_destruction/eradicator2.lua:/canary/data-otservbr-global/monster/quests/heart_of_destruction/eradicator2.lua:ro'
+      - '../data-otservbr-global/scripts/globalevents/others/check_mount.lua:/canary/data-otservbr-global/scripts/globalevents/others/check_mount.lua:ro'
     depends_on:
       db:
         condition: service_healthy
@@ -74,15 +96,18 @@ services:
       args:
         MYAAC_REF: "${MYAAC_REF:-develop}"
     restart: unless-stopped
+    mem_limit: 512m
+    cpus: 2
     environment:
       CANARY_DB_HOST: "${CANARY_DB_HOST:-db}"
       CANARY_DB_PORT: "${CANARY_DB_PORT:-3306}"
       CANARY_DB_NAME: "${CANARY_DB_NAME:-canary}"
       CANARY_DB_USER: "${CANARY_DB_USER:-canary}"
       CANARY_DB_PASSWORD: "${CANARY_DB_PASSWORD:-canary}"
-      CANARY_SERVER_NAME: "${CANARY_SERVER_NAME:-OpenTibiaBR Canary}"
+      CANARY_SERVER_NAME: "${CANARY_SERVER_NAME:-Hegemony PvP}"
       CANARY_SERVER_IP: "${CANARY_SERVER_IP:-127.0.0.1}"
       CANARY_SERVER_LOCATION: "${CANARY_SERVER_LOCATION:-BRA}"
+      TZ: "${CANARY_TIMEZONE:-America/Fortaleza}"
       CANARY_LOGIN_PORT: "${CANARY_LOGIN_PORT:-7171}"
       CANARY_GAME_PORT: "${CANARY_GAME_PORT:-7172}"
       CANARY_STATUS_PORT: "${CANARY_STATUS_PORT:-7173}"
@@ -119,7 +144,10 @@ services:
   login-server:
     image: "${LOGIN_SERVER_IMAGE:-opentibiabr/login-server:latest}"
     restart: unless-stopped
+    mem_limit: 256m
+    cpus: 1
     environment:
+      TZ: "${CANARY_TIMEZONE:-America/Fortaleza}"
       LOGIN_HTTP_PORT: "${LOGIN_HTTP_PORT:-8088}"
       LOGIN_GRPC_PORT: "${LOGIN_GRPC_PORT:-9090}"
       MYSQL_HOST: "${CANARY_DB_HOST:-db}"
