@@ -2,14 +2,17 @@
 --
 -- Compra o equipamento dos kits (o saque de quem morreu) e vende so duas
 -- coisas: Stone Skin Amulet e Might Ring. O kit de UM personagem vale
--- exatamente o preco de um dos dois (PRECO), em qualquer vocacao:
+-- exatamente o preco de um dos dois (PRECO), em qualquer um dos cinco kits:
 --
---   mago  : blue robe 2000 + blue legs 1500 + varinha/cajado 2000
---           + spellbook 1500 + boots of haste 3000              = 10000
---   EK    : zaoan helmet 1500 + zaoan armor 2500 + zaoan legs 1500
---           + magic sword 1500 + boots of haste 3000             = 10000
---   RP    : paladin armor 4000 + zaoan legs 1500 + zaoan helmet 1500
---           + ironworker 3000                                    = 10000
+--   MS/ED       : yalahari mask 1000 + blue robe 1500 + blue legs 1500
+--                 + varinha/cajado 1500 + spellbook 1500 + boots of haste 3000
+--   EK (escudo) : zaoan helmet 1000 + zaoan armor 2000 + zaoan legs 1500
+--                 + magic sword 1500 + shield of corruption 1000 + boots 3000
+--   EK (Avenger): zaoan helmet 1000 + zaoan armor 2000 + zaoan legs 1500
+--                 + avenger 2500 + boots of haste 3000
+--   RP          : zaoan helmet 1000 + paladin armor 4000 + zaoan legs 1500
+--                 + ironworker 3500
+--                                                    todos = 10000
 --
 -- A VENDA E POR CONVERSA ("vender"), NAO PELA JANELA DE TROCA: o motor so
 -- avisa o Lua depois que a venda pela janela ja aconteceu (Npc::onPlayerSellItem),
@@ -29,17 +32,20 @@ local PRECO = 10000
 
 local COMPRA = {
 	[3079] = 3000, -- boots of haste
-	[10385] = 1500, -- zaoan helmet
-	[10384] = 2500, -- zaoan armor
+	[10385] = 1000, -- zaoan helmet
+	[8864] = 1000, -- yalahari mask
+	[10384] = 2000, -- zaoan armor
 	[10387] = 1500, -- zaoan legs
 	[8063] = 4000, -- paladin armor
-	[3567] = 2000, -- blue robe
+	[3567] = 1500, -- blue robe
 	[645] = 1500, -- blue legs
-	[16096] = 2000, -- wand of defiance
-	[16118] = 2000, -- glacial rod
+	[16096] = 1500, -- wand of defiance
+	[16118] = 1500, -- glacial rod
 	[8075] = 1500, -- spellbook of lost souls
 	[3288] = 1500, -- magic sword
-	[8025] = 3000, -- ironworker
+	[11688] = 1000, -- shield of corruption
+	[6527] = 2500, -- the avenger
+	[8025] = 3500, -- ironworker
 }
 
 local npcType = Game.createNpcType(NOME)
