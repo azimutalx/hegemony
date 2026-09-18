@@ -97,7 +97,7 @@ function hegemony_pt_final(string $text): string {
 			// contar 26 mil dias so confunde.
 			'/Conta premium, \d+ days left/',
 			'/Account created\./',
-			'/Your account (name|email) is <b>([^<]*)<\/b><br\/>You will need the account \1 and your password to play on [^.]*\.\s*Please keep your account \1 and password in a safe place and\s*never give your account \1 or password to anybody\./',
+			'/Your account (name|email|Email Address) is <b>([^<]*)<\/b><br\/>You will need the account \1 and your password to play on [^.]*\.\s*Please keep your account \1 and password in a safe place and\s*never give your account \1 or password to anybody\./',
 		],
 		[
 			'Conta premium (permanente)',

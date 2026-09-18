@@ -172,3 +172,12 @@ DELETE FROM `myaac_settings` WHERE `name` = 'core' AND `key` IN ('account_login_
 INSERT INTO `myaac_settings` (`name`, `key`, `value`) VALUES
 	('core', 'account_login_by_email', 'true'),
 	('core', 'account_login_by_email_fallback', 'true');
+
+-- ---------------------------------------------------------------- cadastro
+
+-- Trava de "uma conta por IP a cada 10 minutos" desligada: o site roda atras
+-- do NAT do Docker e ve TODO mundo com o mesmo IP (o gateway da rede do
+-- compose, 172.19.0.1 no log das contas). Com a trava, um amigo criando conta
+-- bloqueava todos os outros por 10 minutos (visto em 18/09).
+DELETE FROM `myaac_settings` WHERE `name` = 'core' AND `key` = 'account_create_ip_block_cooldown';
+INSERT INTO `myaac_settings` (`name`, `key`, `value`) VALUES ('core', 'account_create_ip_block_cooldown', '0');
