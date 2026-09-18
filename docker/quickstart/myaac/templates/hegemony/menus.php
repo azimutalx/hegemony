@@ -1,42 +1,28 @@
 <?php
 
+// Menu do site. So paginas que fazem sentido no Hegemony PvP: sem loja, casas,
+// forum, estagios de experiencia ou monstros (o mapa e so Venore, o nivel
+// volta ao 80 e nao ha NPC de casa nem de loja alem do receptador).
 return [
 	MENU_CATEGORY_NEWS => [
-		'Latest News' => 'news',
-		'News Archive' => 'news/archive',
-		'Changelog' => 'change-log',
+		'Notícias' => 'news',
+		'Arquivo' => 'news/archive',
 	],
 	MENU_CATEGORY_ACCOUNT => [
-		'Account Management' => 'account/manage',
-		'Create Account' => 'account/create',
-		'Lost Account?' => 'account/lost',
-		'Server Rules' => 'rules',
-		'Downloads' => 'downloads',
+		'Minha conta' => 'account/manage',
+		'Criar conta' => 'account/create',
+		'Recuperar conta' => 'account/lost',
+		'Baixar o cliente' => 'downloads',
+		'Regras' => 'rules',
 	],
 	MENU_CATEGORY_COMMUNITY => [
-		'Characters' => 'characters',
-		'Who is Online?' => 'online',
-		'Highscores' => 'highscores',
-		'Last Kills' => 'last-kills',
-		'Houses & Dominions' => 'houses',
-		'Guilds & Alliances' => 'guilds',
-		'Bans & Penalties' => 'bans',
-		'War Forum' => 'forum',
-		'Command Staff' => 'team',
+		'Personagens' => 'characters',
+		'Quem está online' => 'online',
+		'Últimas mortes' => 'last-kills',
+		'Guildas' => 'guilds',
 	],
 	MENU_CATEGORY_LIBRARY => [
-		'Monsters & Bosses' => 'monsters',
-		'Spells & Tactics' => 'spells',
-		'Server Info' => 'ots-info',
-		'Commands' => 'commands',
-		'Exp Stages' => 'exp-stages',
-		'War Gallery' => 'gallery',
-		'Exp Table' => 'exp-table',
-		'FAQ' => 'faq',
-	],
-	MENU_CATEGORY_SHOP => [
-		'Buy War Points' => 'points',
-		'Armory & Supplies' => 'gifts',
-		'Purchase History' => 'gifts/history',
+		'Magias' => 'spells',
+		'Comandos e NPC' => 'commands',
 	],
 ];

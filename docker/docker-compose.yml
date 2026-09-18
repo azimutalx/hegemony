@@ -86,6 +86,10 @@ services:
       - '../data-otservbr-global/monster/quests/heart_of_destruction/eradicator2.lua:/canary/data-otservbr-global/monster/quests/heart_of_destruction/eradicator2.lua:ro'
       - '../data-otservbr-global/scripts/globalevents/others/check_mount.lua:/canary/data-otservbr-global/scripts/globalevents/others/check_mount.lua:ro'
       - '../data/scripts/actions/items/potions.lua:/canary/data/scripts/actions/items/potions.lua:ro'
+      # !aol e !bless vendiam protecao por ouro fora do receptador; a bencao
+      # ainda cortava a experiencia de quem mata. Desativados (ver os arquivos).
+      - '../data/scripts/talkactions/player/aol.lua:/canary/data/scripts/talkactions/player/aol.lua:ro'
+      - '../data/scripts/talkactions/player/bless.lua:/canary/data/scripts/talkactions/player/bless.lua:ro'
       # Regras proprias do Hegemony (mapa so Venore, morte, loja). Pasta nova,
       # nao existe na imagem: montar inteira nao esconde nada do upstream.
       - '../data-otservbr-global/scripts/hegemony:/canary/data-otservbr-global/scripts/hegemony:ro'
@@ -142,6 +146,10 @@ services:
       # so clonasse este repo, o mount criava um diretorio vazio e o site subia
       # sem tema.
       - './quickstart/myaac/templates/hegemony:/var/www/html/templates/hegemony'
+      # Pacote do cliente para a pagina "Baixar o cliente": tools/empacotar.py
+      # grava em ../../hegemony-pacotes (fora do git, ~260 MB) e mantem uma copia
+      # com nome fixo, Hegemony.zip, que o Apache serve em /cliente/Hegemony.zip.
+      - '../../hegemony-pacotes:/var/www/html/cliente:ro'
     networks:
       - canary-net
     depends_on:

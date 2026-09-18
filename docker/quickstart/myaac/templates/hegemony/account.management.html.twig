@@ -55,7 +55,7 @@
 			<table>
 				<tr>
 					<td class="LabelV" >Dica:</td>
-					<td style="width:100%;" >You can register your account for increased protection. Click on "Register Account" and get your free recovery key today!</td>
+					<td style="width:100%;" >Registre a conta para ganhar uma chave de recuperação: com ela você recupera o acesso se esquecer a senha ou o e-mail.</td>
 				</tr>
 			</table>
 			<div style="text-align:center">
@@ -123,7 +123,7 @@
 		</a>
 	</div>
 </div>
-{% set title = 'General Information' %}
+{% set title = 'Informações gerais' %}
 {% set tableClass = 'Table3' %}
 {% set content %}
 <table style="width:100%;" >
@@ -137,7 +137,7 @@
 					<table class="TableContent" width="100%">
 						{% if not config.account_login_by_email or config.account_login_by_email_fallback %}
 						<tr style="background-color: {{ config.lightborder }};" >
-							<td class="LabelV" >Account {% if constant('USE_ACCOUNT_NAME') %}Name{% else %}Number{% endif %}:</td>
+							<td class="LabelV" >{% if constant('USE_ACCOUNT_NAME') %}Nome da conta{% else %}Número da conta{% endif %}:</td>
 							<td style="width:90%;" >{{ account }}</td>
 						</tr>
 						{% endif %}
@@ -238,7 +238,7 @@
 		</a>
 	</div>
 </div>
-{% set title = 'Public Information' %}
+{% set title = 'Informações públicas' %}
 {% set tableClass = 'Table5' %}
 {% set content %}
 <table style="width:100%;">
@@ -299,7 +299,7 @@
 		</a>
 	</div>
 </div>
-{% set title = 'Account Logs' %}
+{% set title = 'Histórico da conta' %}
 {% set tableClass = 'Table3' %}
 {% set content %}
 <table style="width:100%;">
@@ -353,7 +353,7 @@
 		</a>
 	</div>
 </div>
-{% set title = 'Characters' %}
+{% set title = 'Personagens' %}
 {% set content %}
 <table style="width:100%;">
 	<tr>

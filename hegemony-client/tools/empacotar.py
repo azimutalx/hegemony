@@ -21,6 +21,7 @@ modulos extras e um servidores_extras.lua, que o init.lua le se existir.
 """
 import argparse
 import re
+import shutil
 import struct
 import zipfile
 from datetime import date
@@ -149,6 +150,12 @@ def main():
 
     print(f"{quantos} arquivos, {total / 2**20:.0f} MB sem compressao")
     print(f"pacote: {destino} ({destino.stat().st_size / 2**20:.0f} MB)")
+
+    # Nome fixo para o site: a pagina "Baixar o cliente" aponta para
+    # /cliente/Hegemony.zip, e o docker-compose monta esta pasta la.
+    fixo = saida / "Hegemony.zip"
+    shutil.copyfile(destino, fixo)
+    print(f"copia para o site: {fixo}")
 
 
 if __name__ == "__main__":

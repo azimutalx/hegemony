@@ -95,8 +95,13 @@ local MOLDES = {
 			[CONST_SLOT_ARMOR] = 8063, -- paladin armor
 			[CONST_SLOT_LEGS] = 10387, -- zaoan legs
 			[CONST_SLOT_LEFT] = 8025, -- ironworker (nivel 80)
+			[CONST_SLOT_FEET] = 3079, -- boots of haste
 		},
-		municao = { 16142, 100 }, -- drill bolt (nivel 70), infinito
+		-- Neste Canary arma de distancia so puxa municao de ALJAVA na mao do
+		-- escudo (Player::getWeapon -> getQuiverAmmoOfType); o slot de municao
+		-- nem e consultado, e a drill bolt nem entra nele. A aljava pode ir com
+		-- arma de distancia de duas maos.
+		aljava = { 35562, 16142, 100 }, -- quiver com drill bolts (nivel 70), infinitas
 		mochila = comRunas({ { 7642, 1 }, { 238, 1 } }), -- great spirit, great mana
 	},
 	[8] = { -- Elite Knight: melee 95 nas tres armas
@@ -163,9 +168,13 @@ local function darKit(player, m)
 	for slot, id in pairs(slotsDoKit(player, m)) do
 		marcar(player:addItem(id, 1, false, 1, slot), player)
 	end
-	if m.municao then
-		-- com 5 argumentos o addItem cria UMA pilha com subType = quantidade
-		marcar(player:addItem(m.municao[1], 1, false, m.municao[2], CONST_SLOT_AMMO), player)
+	if m.aljava then
+		-- Depois das maos: a aljava so e aceita com a arma de distancia ja na
+		-- outra mao.
+		local aljava = player:addItem(m.aljava[1], 1, false, 1, CONST_SLOT_RIGHT)
+		if aljava then
+			aljava:addItem(m.aljava[2], m.aljava[3])
+		end
 	end
 	local mochila = player:addItem(2854, 1, false, 1, CONST_SLOT_BACKPACK)
 	if mochila then

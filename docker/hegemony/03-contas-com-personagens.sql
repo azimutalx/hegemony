@@ -1,4 +1,4 @@
--- Hegemony PvP: toda conta nova ja nasce com cinco personagens.
+-- Hegemony PvP: toda conta e premium e nasce com cinco personagens.
 -- Idempotente: pode rodar de novo.
 --
 -- Aplicar com:
@@ -28,9 +28,22 @@
 -- os dois cavaleiros se distinguirem na lista. Sexo sorteado; a roupa segue o
 -- sexo (Canary: 0 = feminino, 1 = masculino).
 --
--- Contas de staff (type >= 4) nao recebem nada.
+-- Contas de staff (type >= 4) nao recebem personagens.
+--
+-- PREMIUM (18/09/2026, com o usuario): toda conta e premium. O servidor ja
+-- tratava todo mundo como premium (freePremium, no entrypoint), mas a conta
+-- continuava marcada como gratis: o cliente e o site mostravam "Free
+-- Account". No Canary a conta e premium enquanto `lastday` (fim do premium,
+-- em segundos) estiver no futuro (Account::getPremiumRemainingDays); aqui
+-- vai para 01/01/2100. Contas novas ganham isso num gatilho ANTES do insert
+-- (um AFTER nao pode alterar a propria linha), e as que ja existem, no UPDATE
+-- do fim do arquivo. E um terceiro gatilho, ANTES de cada update, impede que
+-- alguem tire o premium depois: o cadastro do MyAAC salva a conta de novo logo
+-- apos criar e gravava premdays = 0 e lastday = 0 por cima (medido em 18/09).
 
 DROP TRIGGER IF EXISTS `hegemony_conta_nova`;
+DROP TRIGGER IF EXISTS `hegemony_conta_premium`;
+DROP TRIGGER IF EXISTS `hegemony_conta_premium_sempre`;
 DROP PROCEDURE IF EXISTS `hegemony_criar_personagens`;
 DROP FUNCTION IF EXISTS `hegemony_nome`;
 
@@ -84,13 +97,16 @@ BEGIN
 
 		DROP TEMPORARY TABLE IF EXISTS `hegemony_novo`;
 		CREATE TEMPORARY TABLE `hegemony_novo` AS SELECT * FROM `players` WHERE `players`.`name` = amostra LIMIT 1;
-		SET novo = (SELECT MAX(`id`) + 1 FROM `players`);
+		-- id 0 deixa o auto_increment escolher. MAX(id)+1 reaproveitaria o id
+		-- de um personagem apagado, e o kv_store (que nao e limpo ao apagar)
+		-- passaria as marcas dele para o novo, inclusive "ja nasceu" (sem kit).
 		UPDATE `hegemony_novo` SET
-			`id` = novo, `name` = nome, `account_id` = conta, `sex` = sexo,
+			`id` = 0, `name` = nome, `account_id` = conta, `sex` = sexo,
 			`looktype` = IF(sexo = 1, ELT(i, 130, 144, 129, 131, 143), ELT(i, 138, 148, 137, 139, 147)),
 			`town_id` = 9, `posx` = 0, `posy` = 0, `posz` = 0,
 			`lastlogin` = 0, `lastlogout` = 0;
 		INSERT INTO `players` SELECT * FROM `hegemony_novo`;
+		SET novo = LAST_INSERT_ID();
 
 		INSERT INTO `player_items` (`player_id`, `pid`, `sid`, `itemtype`, `count`, `attributes`)
 			VALUES (novo, 11, 101, 23396, 1, '');  -- store inbox
@@ -99,6 +115,20 @@ BEGIN
 		END IF;
 	END WHILE;
 	DROP TEMPORARY TABLE IF EXISTS `hegemony_novo`;
+END$$
+
+CREATE TRIGGER `hegemony_conta_premium` BEFORE INSERT ON `accounts` FOR EACH ROW
+BEGIN
+	SET NEW.`lastday` = 4102444800;  -- 2100-01-01
+	SET NEW.`premdays` = GREATEST(0, FLOOR((4102444800 - UNIX_TIMESTAMP()) / 86400));
+END$$
+
+CREATE TRIGGER `hegemony_conta_premium_sempre` BEFORE UPDATE ON `accounts` FOR EACH ROW
+BEGIN
+	IF NEW.`lastday` < 4102444800 THEN
+		SET NEW.`lastday` = 4102444800;
+		SET NEW.`premdays` = GREATEST(0, FLOOR((4102444800 - UNIX_TIMESTAMP()) / 86400));
+	END IF;
 END$$
 
 CREATE TRIGGER `hegemony_conta_nova` AFTER INSERT ON `accounts` FOR EACH ROW
@@ -114,3 +144,8 @@ DELIMITER ;
 -- automaticos, seria o sexto.
 DELETE FROM `myaac_settings` WHERE `name` = 'core' AND `key` = 'account_create_character_create';
 INSERT INTO `myaac_settings` (`name`, `key`, `value`) VALUES ('core', 'account_create_character_create', 'false');
+
+-- Premium ate 2100 para as contas que ja existem.
+UPDATE `accounts`
+	SET `lastday` = 4102444800, `premdays` = FLOOR((4102444800 - UNIX_TIMESTAMP()) / 86400)
+	WHERE `lastday` < 4102444800;

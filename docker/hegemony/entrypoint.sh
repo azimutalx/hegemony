@@ -83,5 +83,12 @@ set_config freePremium true
 # ao nivel 80 (data-otservbr-global/scripts/hegemony/renascer.lua).
 set_config experienceByKillingPlayers true
 
+# Todas as magias da vocacao ja disponiveis, limitadas pelo nivel. Com true
+# (padrao da imagem) nenhuma magia instantanea funciona sem ser aprendida num
+# NPC professor, e Venore nao tem nenhum. O nivel minimo de cada magia
+# continua checado na hora de lancar (Spell::playerSpellCheck). Sobram so as
+# de needLearn explicito, que sao as do Wheel of Destiny (nivel 275-300).
+set_config toggleLearnSpells false
+
 echo ""
 exec /canary/start.sh "$@"

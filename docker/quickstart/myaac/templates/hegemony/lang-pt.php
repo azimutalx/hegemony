@@ -57,11 +57,11 @@ function hegemony_pt_titles(): array {
 function hegemony_pt_content(): array {
 	return [
 		'All you have to do to create your new account is to enter an account name, password, country and your email address.'
-			=> 'Para criar sua conta, basta informar um nome de conta, senha, país e seu endereço de e-mail.',
+			=> 'Para criar sua conta, informe um nome de conta, seu e-mail e uma senha. A conta já nasce premium e com cinco personagens nível 80 em Venore.',
 		'If you have done so, your account name will be shown on the following page and your account password will be sent to your email address along with further instructions.'
-			=> 'Feito isso, o nome da sua conta aparecerá na próxima página e a senha será enviada para o seu e-mail junto com as instruções.',
+			=> 'Não há confirmação por e-mail: a conta fica pronta na hora. No jogo você entra com o e-mail e a senha.',
 		'If you do not receive the email with your password, please check your spam filter.'
-			=> 'Se o e-mail com a senha não chegar, verifique a caixa de spam.',
+			=> '',
 		'Also you have to agree to the terms presented below.'
 			=> 'Você também precisa aceitar os termos apresentados abaixo.',
 		'Your browser does not support JavaScript or its disabled!'
@@ -74,7 +74,38 @@ function hegemony_pt_content(): array {
 		'To play on ' => 'Para jogar em ',
 		'You are using an ' => 'Você está usando um ',
 		'outdated' => 'desatualizado',
+		// Cadastro concluido (system/pages/account/create.php, caminho sem
+		// verificacao de e-mail, que e o nosso).
+		'Your account has been created. Now you can login and create your first character. See you in Tibia!'
+			=> 'Sua conta foi criada e já vem com cinco personagens nível 80 em Venore: um mago de cada, um paladino e dois cavaleiros (um com espada e escudo, outro com a Avenger). Baixe o cliente, entre com o seu <b>e-mail</b> e escolha com quem lutar.',
+		'Account Created' => 'Conta criada',
+		// Minha conta (system/pages/account/manage.php).
+		'Welcome to your account!' => 'Bem-vindo à sua conta!',
+		'Premium Account' => 'Conta premium',
+		'Free Account' => 'Conta gratuita',
 	];
+}
+
+/**
+ * Trocas que precisam de expressao regular: frases que o MyAAC monta com
+ * quebra de linha e tabulacao no meio, onde o casamento literal nao alcanca.
+ */
+function hegemony_pt_final(string $text): string {
+	return preg_replace(
+		[
+			// O premium vai ate 2100 (docker/hegemony/03-contas-com-personagens.sql):
+			// contar 26 mil dias so confunde.
+			'/Conta premium, \d+ days left/',
+			'/Account created\./',
+			'/Your account (name|email) is <b>([^<]*)<\/b><br\/>You will need the account \1 and your password to play on [^.]*\.\s*Please keep your account \1 and password in a safe place and\s*never give your account \1 or password to anybody\./',
+		],
+		[
+			'Conta premium (permanente)',
+			'Conta criada.',
+			'Sua conta é <b>$2</b>.<br/>No jogo você entra com o <b>e-mail</b> e a senha. Guarde a senha e não a passe para ninguém.',
+		],
+		$text
+	) ?? $text;
 }
 
 /** Aplica um dicionário a um trecho já renderizado. */

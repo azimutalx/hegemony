@@ -10,8 +10,8 @@
 --                 + magic sword 1500 + shield of corruption 1000 + boots 3000
 --   EK (Avenger): zaoan helmet 1000 + zaoan armor 2000 + zaoan legs 1500
 --                 + avenger 2500 + boots of haste 3000
---   RP          : zaoan helmet 1000 + paladin armor 4000 + zaoan legs 1500
---                 + ironworker 3500
+--   RP          : zaoan helmet 1000 + paladin armor 2500 + zaoan legs 1500
+--                 + ironworker 2000 + boots of haste 3000
 --                                                    todos = 10000
 --
 -- A VENDA E POR CONVERSA ("vender"), NAO PELA JANELA DE TROCA: o motor so
@@ -36,7 +36,7 @@ local COMPRA = {
 	[8864] = 1000, -- yalahari mask
 	[10384] = 2000, -- zaoan armor
 	[10387] = 1500, -- zaoan legs
-	[8063] = 4000, -- paladin armor
+	[8063] = 2500, -- paladin armor
 	[3567] = 1500, -- blue robe
 	[645] = 1500, -- blue legs
 	[16096] = 1500, -- wand of defiance
@@ -45,7 +45,7 @@ local COMPRA = {
 	[3288] = 1500, -- magic sword
 	[11688] = 1000, -- shield of corruption
 	[6527] = 2500, -- the avenger
-	[8025] = 3500, -- ironworker
+	[8025] = 2000, -- ironworker
 }
 
 local npcType = Game.createNpcType(NOME)
