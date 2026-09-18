@@ -25,7 +25,15 @@ function g_game.chooseRsa(host)
             g_game.setCustomOs(OsTypes.Linux)
         end
     else
-        g_game.setCustomOs(-1)
+        -- 0, nunca -1. setCustomOs recebe um enum uint16: -1 vira 65535, e o
+        -- Canary so liga o campo de sequencia de 4 bytes quando o sistema
+        -- informado e no maximo 12 (protocolgame.cpp, CHECKSUM_METHOD_SEQUENCE).
+        -- Sem esse campo o servidor escreve cada mensagem 4 bytes mais curta do
+        -- que o cliente le: a primeira mensagem cifrada sai desalinhada e o
+        -- cliente passa a ler lixo ("parse message exception", "invalid packet
+        -- size"). Foi isso que impediu este cliente de entrar no mundo de 17/08
+        -- a 18/09/2026. Com 0, getOs() volta ao sistema real (11 no Windows).
+        g_game.setCustomOs(0)
         g_game.setRsa(OTSERV_RSA)
     end
 
