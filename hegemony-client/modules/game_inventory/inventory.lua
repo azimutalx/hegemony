@@ -282,6 +282,35 @@ function inventoryController:onInit()
     })
 end
 
+-- Hegemony: servidor PvP, o modo seguro fica sempre DESLIGADO e o botao
+-- travado. Com ele ligado o servidor recusa atacar quem nao tem caveira
+-- ("Turn secure mode off...", Combat::canTargetCreature), e no pvp-enforced
+-- ninguem tem caveira: o jogador simplesmente nao conseguia atacar. Quem
+-- decide o modo seguro e o cliente (o servidor so guarda o que recebe), por
+-- isso a trava mora aqui. Nao da vantagem a ninguem: o modo seguro so impede
+-- o proprio jogador de atacar.
+local function travarPvpLigado()
+    g_game.setSafeFight(false)
+    for _, painel in ipairs({ inventoryController.ui.onPanel, inventoryController.ui.offPanel }) do
+        if painel and painel.pvp then
+            painel.pvp:setChecked(true)
+            painel.pvp:setEnabled(false)
+            painel.pvp:setTooltip('PvP sempre ligado no Hegemony')
+        end
+    end
+end
+
+-- O servidor comeca todo login com o modo seguro ligado (Player::secureMode)
+-- e manda isso ao cliente (0xA7) depois do inicio do jogo. Se nao fosse
+-- desfeito aqui, o cliente ficaria achando que o modo esta ligado. O addEvent
+-- tira a troca de dentro do processamento do pacote.
+local function aoMudarModoSeguro(ligado)
+    combatEvent()
+    if ligado then
+        addEvent(travarPvpLigado)
+    end
+end
+
 function inventoryController:onGameStart()
     local player = g_game.getLocalPlayer()
     if player then
@@ -309,7 +338,7 @@ function inventoryController:onGameStart()
         onAutoWalk = walkEvent,
         onFightModeChange = combatEvent,
         onChaseModeChange = combatEvent,
-        onSafeFightChange = combatEvent,
+        onSafeFightChange = aoMudarModoSeguro,
         onPVPModeChange = combatEvent
     }):execute()
 
@@ -347,6 +376,10 @@ function inventoryController:onGameStart()
             updateMonkMirrorItem(leftItem)
         end
     end
+
+    -- Depois de restaurar LastCombatControls, que traria de volta o modo
+    -- seguro salvo de outra sessao.
+    travarPvpLigado()
 end
 
 function inventoryController:onGameEnd()
@@ -387,17 +420,9 @@ function inventoryController:onTerminate()
 end
 
 function onSetSafeFight(self, checked)
-    if not checked then
-        inventoryController.ui.onPanel.pvp:setChecked(false)
-        inventoryController.ui.offPanel.pvp:setChecked(false)
-      else
-        inventoryController.ui.onPanel.pvp:setChecked(true)  
-        inventoryController.ui.offPanel.pvp:setChecked(true)  
-      end
-    g_game.setSafeFight(not checked)
-    if not checked then
-        g_game.cancelAttack()
-    end
+    -- Hegemony: o PvP nunca desliga (ver travarPvpLigado). Qualquer mudanca
+    -- no botao volta ao estado travado.
+    travarPvpLigado()
 end
 
 function selectPosture(key, ignoreUpdate)
