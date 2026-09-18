@@ -86,6 +86,14 @@ services:
       - '../data-otservbr-global/monster/quests/heart_of_destruction/eradicator2.lua:/canary/data-otservbr-global/monster/quests/heart_of_destruction/eradicator2.lua:ro'
       - '../data-otservbr-global/scripts/globalevents/others/check_mount.lua:/canary/data-otservbr-global/scripts/globalevents/others/check_mount.lua:ro'
       - '../data/scripts/actions/items/potions.lua:/canary/data/scripts/actions/items/potions.lua:ro'
+      # Regras proprias do Hegemony (mapa so Venore, morte, loja). Pasta nova,
+      # nao existe na imagem: montar inteira nao esconde nada do upstream.
+      - '../data-otservbr-global/scripts/hegemony:/canary/data-otservbr-global/scripts/hegemony:ro'
+      # Spawns de NPC sem os 64 de Venore: o receptador (scripts/hegemony) e o
+      # unico que negocia, e barco/carruagem seriam saidas da cidade. NPC
+      # removido por script renasce sozinho em 60 s, por isso o corte e aqui.
+      # O arquivo so e montado; o mapa baixado continua fora do git.
+      - '../data-otservbr-global/world/otservbr-npc.xml:/canary/data-otservbr-global/world/otservbr-npc.xml:ro'
     depends_on:
       db:
         condition: service_healthy

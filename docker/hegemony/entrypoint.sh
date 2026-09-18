@@ -76,5 +76,12 @@ set_config removeWeaponCharges false
 # gratis viraria Druid comum na primeira entrada.
 set_config freePremium true
 
+# Matar outro personagem da experiencia. A imagem vem com false (o config.lua
+# da raiz do repo diz true, mas ele nunca e lido: ver o cabecalho). O ganho e
+# o do motor: 75% da experiencia que a vitima perderia, se a diferenca de
+# nivel couber em expFromPlayersLevelRange (75). A vitima, por sua vez, volta
+# ao nivel 80 (data-otservbr-global/scripts/hegemony/renascer.lua).
+set_config experienceByKillingPlayers true
+
 echo ""
 exec /canary/start.sh "$@"
