@@ -1,3 +1,81 @@
+# Hegemony PvP
+
+Servidor de Tibia focado em PvP, construído sobre o [Canary](https://github.com/opentibiabr/canary)
+— motor OpenTibia em C++20 com scripts em Lua — com site MyAAC e banco MariaDB, tudo em Docker.
+Projeto pessoal de Hemerson Abreu.
+
+Este repositório é um fork do Canary. O motor e o datapack são do upstream; o que é do Hegemony
+está nos commits a partir de [`57f621c47`](https://github.com/azimutalx/hegemony/commit/57f621c47).
+Cada um explica a causa do problema e como a correção foi medida — o histórico é a melhor
+documentação do projeto. O README original do Canary continua mais abaixo.
+
+## Estado
+
+- **Jogável de ponta a ponta** (protocolo 15.25): login, lista de personagens e entrada no mundo.
+- **O cliente próprio (`hegemony-client/`, sobre o OTClient) ainda não entra no mundo.** Há uma
+  dessincronização de protocolo: o parsing quebra no byte 16.745 de uma mensagem de 22.047 bytes
+  (opcode `0xF0`). Compressão e defasagem de versão já foram descartadas por medição; o próximo
+  passo é instrumentar `protocol.cpp`.
+
+## O que foi feito aqui
+
+**Correções no datapack (Lua)**
+
+- **Aluguel de montaria que nunca expirava.** `check_mount.lua` usava `break` onde precisava pular
+  o jogador: o laço morria no primeiro jogador sem cavalo alugado, que é o caso comum.
+- **Boss do dia com o nome errado.** Havia dois registros para o mesmo boss, e o sorteio publica a
+  chave de registro, não `monster.name` — todo jogador via "Eradicator2" ao entrar.
+- **Poção infinita gerava frasco infinito.** `potions.lua` entregava o frasco vazio antes de
+  checar se a poção seria consumida.
+- Scripts migrados da API procedural antiga (`doPlayerSendCancel`, `doSendMagicEffect`,
+  `getPlayerGUID`) para a API orientada a objetos do motor (`player:sendCancelMessage`,
+  `Position:sendMagicEffect`, `player:getGuid`).
+
+**Infraestrutura**
+
+- **Configuração reproduzível.** O servidor funcionava graças a um ajuste feito à mão dentro do
+  container, que qualquer `docker compose down` apagaria. `docker/hegemony/entrypoint.sh` aplica a
+  configuração do Hegemony antes do `start.sh` da imagem e **aborta** se uma chave esperada sumir,
+  em vez de subir com o padrão do upstream sem avisar.
+- **Fuso horário.** O container rodava em UTC e o Canary calcula "hoje" com `localtime()`: a
+  criatura e o boss do dia trocavam às 21h de Brasília.
+- Limites de memória e CPU por container, e o `OPTIMIZE TABLE` a cada boot desligado — em InnoDB
+  ele reconstrói a tabela inteira e bloqueia.
+
+**Desenho do jogo**
+
+- Todo personagem novo nasce **nível 80**, com skills de treinado e kit infinito de runas e
+  poções, e evolui normalmente depois. O MyAAC copia o personagem de um "Sample" por vocação, então
+  os Samples são o molde (`docker/hegemony/02-modelos-nivel-80.sql`).
+
+## Como rodar
+
+Precisa de Docker.
+
+```bash
+cd docker
+cp .env.dist .env
+docker compose up -d
+```
+
+O primeiro boot baixa o mapa (cerca de 190 MB). Depois disso: site em `http://localhost:8080` e
+login web em `http://127.0.0.1:8088/login`. O login é pelo **e-mail** da conta, não pelo nome.
+
+As senhas que vêm nos arquivos (`docker/.env.dist`, `schema.sql`, `docker/data/*.sql`) são padrões
+de desenvolvimento, as mesmas que o Canary publica. Troque-as antes de abrir o servidor para outras
+pessoas.
+
+## Créditos e licença
+
+- Motor, datapack e ferramentas: [Canary](https://github.com/opentibiabr/canary), sob GPL-2.0 — que
+  vale também para este fork (ver `LICENSE`).
+- Cliente: [OTClient](https://github.com/mehah/otclient). Site: [MyAAC](https://github.com/slawkens/myaac).
+- Tibia é marca da CipSoft GmbH. O cliente oficial não está neste repositório.
+
+---
+
+> O que segue é o README original do Canary.
+
 # Canary
 
 [![Discord](https://img.shields.io/discord/528117503952551936.svg?style=flat-square&logo=discord)](https://discord.gg/gvTj5sh9Mp)
