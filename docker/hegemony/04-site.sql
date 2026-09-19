@@ -29,7 +29,7 @@ INSERT INTO `myaac_news` (`title`, `body`, `type`, `date`, `category`, `player_i
 <ol>
 <li>Instale o <a href="https://tailscale.com/download" target="_blank" rel="noopener">Tailscale</a>, entre com uma conta Google ou Microsoft e aceite o convite que você recebeu. Deixe ele ligado enquanto joga.</li>
 <li>Baixe o cliente na página <a href="/index.php/downloads">Baixar o cliente</a> e extraia a pasta inteira.</li>
-<li><a href="/index.php/account/create">Crie sua conta</a>. Ela já nasce premium e com cinco personagens.</li>
+<li><a href="/index.php/account/create">Crie sua conta</a>. Ela já nasce com cinco personagens.</li>
 <li>Abra o <b>Hegemony.exe</b>, entre com o <b>e-mail</b> (não o nome da conta) e a senha, e escolha com quem lutar.</li>
 </ol>
 <p>Não conectou? Quase sempre é o Tailscale desligado.</p>',
@@ -39,7 +39,7 @@ INSERT INTO `myaac_news` (`title`, `body`, `type`, `date`, `category`, `player_i
 '<p>O Hegemony é PvP puro dentro de <b>Venore</b>: a cidade do térreo para cima, sem esgoto e sem nenhuma saída. Todo mundo começa no mesmo ponto e a diferença está no que você tira dos outros.</p>
 <h3>Todo mundo nasce igual</h3>
 <ul>
-<li>Sua conta é premium e já vem com <b>cinco personagens nível 80</b>: Master Sorcerer, Elder Druid, Royal Paladin e dois Elite Knights, um com Magic Sword e escudo, outro com a Avenger.</li>
+<li>Sua conta já vem com <b>cinco personagens nível 80</b>: Master Sorcerer, Elder Druid, Royal Paladin e dois Elite Knights, um com Magic Sword e escudo, outro com a Avenger.</li>
 <li>Cada um nasce com o kit da vocação e com <b>todas as magias</b> liberadas (cada uma respeita o nível mínimo dela).</li>
 <li>Runas, poções, munição e comida são <b>infinitas</b>.</li>
 </ul>
@@ -85,7 +85,7 @@ UPDATE `myaac_pages` SET `title` = 'Regras', `enable_tinymce` = 0, `body` =
 </ul>
 <h3>Personagens</h3>
 <ul>
-<li>A conta nasce premium, com cinco personagens nível 80: Master Sorcerer, Elder Druid, Royal Paladin e dois Elite Knights (espada e escudo, ou Avenger).</li>
+<li>A conta nasce com cinco personagens nível 80: Master Sorcerer, Elder Druid, Royal Paladin e dois Elite Knights (espada e escudo, ou Avenger).</li>
 <li>Todas as magias da vocação vêm liberadas, cada uma no nível mínimo dela.</li>
 <li>Runas, poções, munição e comida são infinitas.</li>
 </ul>

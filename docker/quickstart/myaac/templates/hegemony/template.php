@@ -157,7 +157,7 @@ function hegemony_link_personagem(string $nome): string {
 							<div class="panel-body">
 								<ul class="regras-rapidas">
 									<li><strong>Mapa</strong>Venore do térreo para cima, sem esgoto. PvP livre.</li>
-									<li><strong>Nascimento</strong>Nível 80 com o kit da vocação. Conta premium com 5 personagens.</li>
+									<li><strong>Nascimento</strong>Nível 80 com o kit da vocação. Cada conta vem com 5 personagens.</li>
 									<li><strong>Matar</strong>Dá experiência. Quem mata fica 15 min marcado: sem logout e sem área protegida.</li>
 									<li><strong>Morrer</strong>Tudo cai no corpo e você volta ao 80 com kit novo.</li>
 									<li><strong>Sair do jogo</strong>Nível e skills voltam ao 80. Os itens ficam.</li>

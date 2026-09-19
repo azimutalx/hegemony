@@ -1,4 +1,4 @@
--- Hegemony PvP: toda conta e premium e nasce com cinco personagens.
+-- Hegemony PvP: toda conta nasce com cinco personagens.
 -- Idempotente: pode rodar de novo.
 --
 -- Aplicar com:
@@ -30,16 +30,12 @@
 --
 -- Contas de staff (type >= 4) nao recebem personagens.
 --
--- PREMIUM (18/09/2026, com o usuario): toda conta e premium. O servidor ja
--- tratava todo mundo como premium (freePremium, no entrypoint), mas a conta
--- continuava marcada como gratis: o cliente e o site mostravam "Free
--- Account". No Canary a conta e premium enquanto `lastday` (fim do premium,
--- em segundos) estiver no futuro (Account::getPremiumRemainingDays); aqui
--- vai para 01/01/2100. Contas novas ganham isso num gatilho ANTES do insert
--- (um AFTER nao pode alterar a propria linha), e as que ja existem, no UPDATE
--- do fim do arquivo. E um terceiro gatilho, ANTES de cada update, impede que
--- alguem tire o premium depois: o cadastro do MyAAC salva a conta de novo logo
--- apos criar e gravava premdays = 0 e lastday = 0 por cima (medido em 18/09).
+-- PREMIUM: nenhum. Em 18/09 as contas chegaram a nascer premium ate 2100
+-- (gatilhos BEFORE INSERT e BEFORE UPDATE) e no mesmo dia o usuario pediu
+-- para voltarem a ser gratis. O jogo nao muda: o servidor trata todo mundo
+-- como premium pelo freePremium do entrypoint (Player::isPremium), que e o
+-- que segura a vocacao promovida e as magias. So o rotulo "Free Account" do
+-- site e do cliente volta. Os DROP abaixo continuam para limpar banco antigo.
 
 DROP TRIGGER IF EXISTS `hegemony_conta_nova`;
 DROP TRIGGER IF EXISTS `hegemony_conta_premium`;
@@ -117,20 +113,6 @@ BEGIN
 	DROP TEMPORARY TABLE IF EXISTS `hegemony_novo`;
 END$$
 
-CREATE TRIGGER `hegemony_conta_premium` BEFORE INSERT ON `accounts` FOR EACH ROW
-BEGIN
-	SET NEW.`lastday` = 4102444800;  -- 2100-01-01
-	SET NEW.`premdays` = GREATEST(0, FLOOR((4102444800 - UNIX_TIMESTAMP()) / 86400));
-END$$
-
-CREATE TRIGGER `hegemony_conta_premium_sempre` BEFORE UPDATE ON `accounts` FOR EACH ROW
-BEGIN
-	IF NEW.`lastday` < 4102444800 THEN
-		SET NEW.`lastday` = 4102444800;
-		SET NEW.`premdays` = GREATEST(0, FLOOR((4102444800 - UNIX_TIMESTAMP()) / 86400));
-	END IF;
-END$$
-
 CREATE TRIGGER `hegemony_conta_nova` AFTER INSERT ON `accounts` FOR EACH ROW
 BEGIN
 	IF NEW.`type` < 4 THEN
@@ -145,7 +127,5 @@ DELIMITER ;
 DELETE FROM `myaac_settings` WHERE `name` = 'core' AND `key` = 'account_create_character_create';
 INSERT INTO `myaac_settings` (`name`, `key`, `value`) VALUES ('core', 'account_create_character_create', 'false');
 
--- Premium ate 2100 para as contas que ja existem.
-UPDATE `accounts`
-	SET `lastday` = 4102444800, `premdays` = FLOOR((4102444800 - UNIX_TIMESTAMP()) / 86400)
-	WHERE `lastday` < 4102444800;
+-- Desfaz o premium ate 2100 dado pelos gatilhos antigos (so esse valor exato).
+UPDATE `accounts` SET `premdays` = 0, `lastday` = 0 WHERE `lastday` = 4102444800;
