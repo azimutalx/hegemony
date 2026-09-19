@@ -269,6 +269,10 @@ function Hegemony.renascer(player)
 	end
 	Hegemony.voltarAoMolde(player)
 	darKit(player, m)
+	-- Morrer nao zera cooldown no motor: o Player e reaproveitado (ou
+	-- recarregado com as condicoes salvas) e a SD de antes da morte seguia
+	-- bloqueada. Zera magias e grupos e avisa o cliente.
+	player:clearSpellCooldowns()
 	kv(player):remove(KV_RESETAR)
 	kv(player):set(KV_NASCEU, true)
 	return true

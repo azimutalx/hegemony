@@ -2367,6 +2367,9 @@ function init()
   topButton = modules.client_topmenu.addTopRightToggleButton(
     'otuiEditorButton', tr('OTUI Editor'), '/images/topbuttons/buttons', toggle)
   topButton:setOn(false)
+  -- Hegemony: botao de desenvolvedor escondido do jogador (no pacote dos
+  -- amigos o modulo nem vai; ver tools/empacotar.py). Ctrl+Alt+U ainda abre.
+  topButton:hide()
 
   Keybind.new('Debug', 'Toggle OTUI Editor', 'Ctrl+Alt+U', '')
   Keybind.bind('Debug', 'Toggle OTUI Editor', {

@@ -40,6 +40,11 @@ end
 function UIItem:onDrop(widget, mousePos, forced)
     self:setBorderWidth(0)
 
+    -- Hegemony: magia da Spell List solta no item de um botao do action bar.
+    if widget and widget.spellWords then
+        return modules.game_actionbar ~= nil and modules.game_actionbar.tryAssignSpellFromDrop(mousePos, widget)
+    end
+
     if not self:canAcceptDrop(widget, mousePos) and not forced then
         return false
     end

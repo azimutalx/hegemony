@@ -1328,6 +1328,32 @@ function tryAssignActionButtonFromDrop(mousePos, draggedWidget, item)
     return true
 end
 
+--- Hegemony: magia arrastada da Spell List (widget com spellWords) para um
+--- botao. Grava como a janela "Assign Spell" grava: texto enviado sozinho.
+function tryAssignSpellFromDrop(mousePos, draggedWidget)
+    if not draggedWidget or not draggedWidget.spellWords or not gameRootPanel then
+        return false
+    end
+    local clickedWidget = gameRootPanel:recursiveGetChildByPos(mousePos, false)
+    local tabBar = clickedWidget and clickedWidget:backwardsGetWidgetById("tabBar")
+    if not tabBar or not tabBar:isVisible() then
+        return false
+    end
+    local button = getButtonFromWidget(clickedWidget)
+    local actionBar = tabBar:getParent()
+    if not button or not button:isVisible() or not actionBar or not actionBar:isVisible() then
+        return false
+    end
+    if actionBar.locked then
+        modules.game_textmessage.displayFailureMessage(tr('Action bar is locked'))
+        return true
+    end
+    local barID, buttonID = string.match(button:getId(), "(.*)%.(.*)")
+    ApiJson.createOrUpdateText(tonumber(barID), tonumber(buttonID), draggedWidget.spellWords, true)
+    updateButton(button)
+    return true
+end
+
 -- move button to other slot bar 
 --- Resets a dragging widget
 function resetDragWidget(self, button)

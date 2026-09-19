@@ -229,6 +229,21 @@ function initializeSpelllist()
             tmpLabel:setImageSize(tosize(SpelllistSettings[SpelllistProfile].iconSize.width .. ' ' ..
                                              SpelllistSettings[SpelllistProfile].iconSize.height))
             tmpLabel.onClick = updateSpellInformation
+
+            -- Hegemony: arrastar a magia para o action bar, como no cliente
+            -- oficial. Sem isto o jogador soltava a magia no slot e nada
+            -- acontecia; so a janela "Assign Spell" funcionava. Quem recebe
+            -- e o action bar (tryAssignSpellFromDrop), pelas palavras.
+            tmpLabel:setDraggable(true)
+            tmpLabel.spellWords = info.words
+            tmpLabel.onDragEnter = function(self, mousePos)
+                g_mouse.pushCursor('target')
+                return true
+            end
+            tmpLabel.onDragLeave = function(self, droppedWidget, mousePos)
+                g_mouse.popCursor('target')
+                return true
+            end
         end
     end
 

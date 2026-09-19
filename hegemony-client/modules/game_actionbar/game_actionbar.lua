@@ -155,6 +155,9 @@ function setupActionBar(n)
                widget:setDraggable(false)
                
                widget.onDrop = function(self, draggedWidget, mousePos)
+                    if draggedWidget and draggedWidget.spellWords then
+                        return tryAssignSpellFromDrop(mousePos, draggedWidget)
+                    end
                     if draggedWidget and draggedWidget.currentDragThing then
                         if tryAssignActionButtonFromDrop(mousePos, draggedWidget, draggedWidget.currentDragThing) then
                             return true

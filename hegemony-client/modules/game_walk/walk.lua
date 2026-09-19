@@ -72,6 +72,23 @@ local function canChangeFloor(pos, deltaZ)
     return fromTile and fromTile:hasElevation(3) and toTile:isWalkable()
 end
 
+-- Hegemony: magic wall (2128) e wild growth (2130) nao vem marcados como
+-- intransponiveis no appearances.dat, so como "evitar" no caminho automatico.
+-- O cliente previa o passo para dentro da parede, o servidor recusava ("There
+-- is not enough room.") e o personagem voltava com a caminhada travada: era a
+-- demora para contornar a MW na diagonal (medido em 18/09: tile com a MW dava
+-- isWalkable() = true). Aqui eles contam como parede.
+local BARREIRAS = { [2128] = true, [2130] = true }
+
+local function temBarreira(tile)
+    for _, item in ipairs(tile:getItems()) do
+        if BARREIRAS[item:getId()] then
+            return true
+        end
+    end
+    return false
+end
+
 --- Makes the player walk in the given direction.
 local function walk(dir)
     local player = g_game.getLocalPlayer()
@@ -111,6 +128,9 @@ local function walk(dir)
     if g_game.getFeature(GameAllowPreWalk) then
         local toPos = Position.translatedToDirection(player:getPosition(), dir)
         local toTile = g_map.getTile(toPos)
+        if toTile and temBarreira(toTile) then
+            return false
+        end
         if not toTile or not toTile:isWalkable() then
             if not canChangeFloor(toPos, 1) and not canChangeFloor(toPos, -1) then
                 return false

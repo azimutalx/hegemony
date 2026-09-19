@@ -150,6 +150,9 @@ function init()
 
     terminalButton = modules.client_topmenu.addTopRightToggleButton('terminalButton', tr('Terminal') .. ' (Ctrl + T)',
                                                           '/images/topbuttons/terminal', toggle)
+    -- Hegemony: botao de desenvolvedor escondido do jogador (no pacote dos
+    -- amigos o modulo nem vai; ver tools/empacotar.py).
+    terminalButton:hide()
     Keybind.new("Misc.", "Toggle Terminal", "Ctrl+T", "")
     Keybind.bind("Misc.", "Toggle Terminal", {{
         type = KEY_DOWN,
