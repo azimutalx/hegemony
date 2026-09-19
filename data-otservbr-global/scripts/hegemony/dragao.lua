@@ -3,8 +3,14 @@
 --
 -- O DRAGAO nasce num cruzamento do pantano (andar 7, ao sul do templo, varios
 -- acessos) a cada CONFIG.INTERVALO depois de morrer, com aviso para todos 1 min
--- antes. Ele nao anda: e um covil, como no LoL. Morre de qualquer ataque, e a
--- alma e de quem der o ultimo golpe. Quem causou ao menos 10% do dano leva ouro.
+-- antes. Anda atras de quem estiver perto, mas preso ao covil: uma zona de
+-- CONFIG.COLEIRA passos em volta dele que so o dragao nao pode deixar (a mesma
+-- trava que prende os jogadores em Venore). Quem fica fora apanha de longe,
+-- mas nao arrasta o dragao pela cidade. A primeira versao teleportava de volta
+-- e curava; medido: quem parava logo depois do limite fazia o dragao ir e
+-- voltar a cada 2 s, curado. Sem apanhar por CONFIG.CALMA segundos, recupera
+-- vida. Morre de qualquer ataque, e a alma e de quem der o ultimo golpe. Quem
+-- causou ao menos 10% do dano leva ouro.
 --
 -- A RUNA DO CACADOR e a vantagem comprada para roubar o dragao: carga unica,
 -- vendida pelo Varg, tira um dano fixo bem maior que a SD (so no dragao) e so
@@ -19,7 +25,9 @@
 --   - quem tem 3 nao ganha alma do dragao (o lider nao farma o objetivo);
 --   - quem mata o dono de almas rouba 1 e leva 5 mil de ouro por alma dele;
 --   - com 3 almas, a posicao do dono e anunciada a cada minuto;
---   - morrer ou deslogar zera (a regra do Hegemony para tudo).
+--   - morrer ou deslogar zera (a regra do Hegemony para tudo);
+--   - quem carrega alma tem uma aura de brasa em volta (efeito anexado 100, e
+--     101 maior com 3 almas; o desenho mora no cliente, game_attachedeffects).
 -- Abaixo de ~29% de bonus nenhum mago morre com 2 SDs em vez de 3 (SD em
 -- jogador mediu 187-211 contra 545 de vida): o bonus decide luta parelha, nao
 -- 2 contra 1.
@@ -38,6 +46,10 @@ local CONFIG = {
 	INTERVALO = 5 * 60, -- s entre a morte de um e o proximo
 	AVISO = 60, -- s de antecedencia do aviso
 	VIDA = 8000, -- SD em monstro tira ~400 (em jogador o Tibia corta pela metade)
+	VELOCIDADE = 120, -- jogador anda a 209: da para fugir dele
+	COLEIRA = 6, -- raio da zona do covil, que o dragao nao deixa
+	CALMA = 6, -- s sem apanhar ate comecar a se curar
+	REGENERACAO = 0.10, -- fracao da vida curada a cada 2 s de calma
 	RUNA_ID = 17112, -- runa verde e fina...
 	RUNA_AID = 64702, -- ...com esta marca, posta pelo Varg na venda
 	RUNA_SPELL_ID = 299,
@@ -51,6 +63,8 @@ local CONFIG = {
 	VALIDADE = 10 * 60,
 	OURO_POR_ALMA = 5000,
 	AVISO_PORTADOR = 60, -- s entre os anuncios de quem tem o maximo
+	AURA = 100, -- efeito anexado com 1 ou 2 almas
+	AURA_MAXIMA = 101, -- e com o maximo
 }
 
 -- O Varg (receptador.lua) vende a runa com estes dados.
@@ -96,7 +110,7 @@ dragao.race = "blood"
 -- Sem corpo: o custom_monster_loot.lua do Canary da "christmas tokens" a todo
 -- monstro (exemplo que veio de fabrica), e o saque aparecia no dragao.
 dragao.corpse = 0
-dragao.speed = 0 -- nao sai do covil
+dragao.speed = CONFIG.VELOCIDADE
 dragao.manaCost = 0
 dragao.changeTarget = { interval = 4000, chance = 20 }
 dragao.strategiesTarget = { nearest = 70, random = 30 }
@@ -177,6 +191,16 @@ local function avisarAlmas(jogador)
 		n, n > 1 and "s" or "", math.floor(n * CONFIG.BONUS_POR_ALMA * 100 + 0.5), math.floor(CONFIG.VALIDADE / 60)))
 end
 
+-- A aura acompanha as almas: some, aparece ou cresce a cada mudanca.
+local function atualizarAura(jogador)
+	jogador:detachEffectById(CONFIG.AURA)
+	jogador:detachEffectById(CONFIG.AURA_MAXIMA)
+	local n = almasDe(jogador)
+	if n > 0 then
+		jogador:attachEffectById(n >= CONFIG.MAX_ALMAS and CONFIG.AURA_MAXIMA or CONFIG.AURA, false)
+	end
+end
+
 local function darAlma(jogador, origem)
 	local guid = jogador:getGuid()
 	local a = almas[guid] or { n = 0 }
@@ -187,6 +211,7 @@ local function darAlma(jogador, origem)
 	a.expira = os.time() + CONFIG.VALIDADE
 	a.anuncio = 0
 	almas[guid] = a
+	atualizarAura(jogador)
 	avisarAlmas(jogador)
 	log("almas", "{} ganhou alma ({}), agora {}", jogador:getName(), origem, a.n)
 	return true
@@ -203,6 +228,7 @@ local function zerarAlmas(jogador, motivo)
 	local a = almas[jogador:getGuid()]
 	if a then
 		almas[jogador:getGuid()] = nil
+		atualizarAura(jogador)
 		log("almas", "{} perdeu {} alma(s) ({})", jogador:getName(), a.n, motivo)
 	end
 end
@@ -307,6 +333,7 @@ local estado = {
 	avisado = false,
 	id = nil, -- creature id do dragao vivo
 	nasceu = 0,
+	ultimoDano = 0,
 	dano = {}, -- nome do jogador -> dano causado
 }
 
@@ -322,6 +349,7 @@ function vidaDragao.onHealthChange(creature, attacker, primaryDamage, primaryTyp
 		local nome = jogador:getName()
 		local total = math.min(creature:getHealth(), math.abs(primaryDamage) + math.abs(secondaryDamage))
 		estado.dano[nome] = (estado.dano[nome] or 0) + total
+		estado.ultimoDano = os.time()
 	end
 	return primaryDamage, primaryType, secondaryDamage, secondaryType
 end
@@ -359,6 +387,34 @@ function morteDragao.onDeath(creature, corpse, killer, mostDamageKiller, unjusti
 end
 morteDragao:register()
 
+-- A coleira: so o dragao nao sai da zona do covil. O ZoneEvent devolve o
+-- retorno direto ao motor e nil BLOQUEIA: sempre retornar algo (ver venore.lua).
+local covil = Zone("hegemony.covil")
+covil:addArea(Position(CONFIG.COVIL.x - CONFIG.COLEIRA, CONFIG.COVIL.y - CONFIG.COLEIRA, CONFIG.COVIL.z), Position(CONFIG.COVIL.x + CONFIG.COLEIRA, CONFIG.COVIL.y + CONFIG.COLEIRA, CONFIG.COVIL.z))
+local coleira = ZoneEvent(covil)
+function coleira.beforeLeave(zone, creature)
+	return not (estado.id ~= nil and creature:getId() == estado.id)
+end
+coleira:register()
+
+-- A cada 2 s enquanto o dragao vive: cura sem apanhar. Largado ate encher, o
+-- dano de quem bateu deixa de contar (a luta recomeca do zero).
+local function cuidarDoDragao()
+	local m = dragaoVivo()
+	if not m then
+		return
+	end
+	local pos = m:getPosition()
+	if os.time() - estado.ultimoDano >= CONFIG.CALMA and m:getHealth() < m:getMaxHealth() then
+		m:addHealth(math.floor(m:getMaxHealth() * CONFIG.REGENERACAO))
+		pos:sendMagicEffect(CONST_ME_MAGIC_GREEN)
+		if m:getHealth() >= m:getMaxHealth() then
+			estado.dano = {}
+		end
+	end
+	addEvent(cuidarDoDragao, 2000)
+end
+
 local function nascer()
 	local m = Game.createMonster(CONFIG.NOME, CONFIG.COVIL, true, true)
 	if not m then
@@ -370,7 +426,9 @@ local function nascer()
 	m:registerEvent("HegemonyDragaoMorte")
 	estado.id = m:getId()
 	estado.nasceu = os.time()
+	estado.ultimoDano = os.time()
 	estado.dano = {}
+	addEvent(cuidarDoDragao, 2000)
 	CONFIG.COVIL:sendMagicEffect(CONST_ME_FIREAREA)
 	avisarTodos("O Dragao de Venore despertou no pantano, ao sul do templo!")
 	log("dragao", "nasceu")
@@ -391,7 +449,7 @@ function relogio.onThink(interval)
 		end
 	end
 
-	-- Almas: validade, brilho em quem carrega e anuncio de quem tem o maximo.
+	-- Almas: validade, e brilho e anuncio de quem tem o maximo.
 	for _, p in ipairs(Game.getPlayers()) do
 		local a = almas[p:getGuid()]
 		if a then
@@ -399,7 +457,9 @@ function relogio.onThink(interval)
 				zerarAlmas(p, "expirou")
 				avisarAlmas(p)
 			else
-				p:getPosition():sendMagicEffect(a.n >= CONFIG.MAX_ALMAS and CONST_ME_FIREAREA or CONST_ME_HITBYFIRE)
+				if a.n >= CONFIG.MAX_ALMAS then
+					p:getPosition():sendMagicEffect(CONST_ME_FIREAREA)
+				end
 				if a.n >= CONFIG.MAX_ALMAS and agora - (a.anuncio or 0) >= CONFIG.AVISO_PORTADOR then
 					a.anuncio = agora
 					for _, outro in ipairs(Game.getPlayers()) do

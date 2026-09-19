@@ -115,9 +115,9 @@ UPDATE `myaac_pages` SET `title` = 'Regras', `enable_tinymce` = 0, `body` =
 </ul>
 <h3>O Dragão de Venore</h3>
 <ul>
-<li>A cada 5 minutos o <b>Dragão de Venore</b> nasce no pântano, ao sul do templo. Todos recebem um aviso 1 minuto antes. Ele não sai do covil.</li>
+<li>A cada 5 minutos o <b>Dragão de Venore</b> nasce no pântano, ao sul do templo. Todos recebem um aviso 1 minuto antes. Ele anda e persegue quem estiver perto, mas não sai do covil: quem fica de fora só apanha de longe. Se ninguém bater nele por alguns segundos, ele se cura.</li>
 <li>Quem der o <b>último golpe</b> leva uma <b>alma do dragão</b>. Quem causou pelo menos 10% do dano leva 2.000 de ouro.</li>
-<li>Cada alma dá <b>+4% de dano contra jogadores</b>, até 3 almas. Elas somem em 10 minutos, e o prazo só renova quando você mata alguém. Morrer ou sair do jogo apaga as almas.</li>
+<li>Quem carrega alma fica com uma <b>aura de brasa</b> em volta (maior com 3). Cada alma dá <b>+4% de dano contra jogadores</b>, até 3 almas. Elas somem em 10 minutos, e o prazo só renova quando você mata alguém. Morrer ou sair do jogo apaga as almas.</li>
 <li>Quem tem 3 almas não ganha outra do dragão, e a posição dele é anunciada a todos a cada minuto.</li>
 <li>Quem mata alguém com almas <b>rouba uma</b> e ganha 5.000 de ouro por alma que ele tinha.</li>
 <li><b>Runa do Caçador</b>: o Varg vende por 5.000. Carga única, tira 1.500 do dragão e só alcança 2 passos. É o jeito de roubar o dragão de quem estava batendo nele.</li>
