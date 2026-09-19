@@ -52,7 +52,14 @@ INSERT INTO `myaac_news` (`title`, `body`, `type`, `date`, `category`, `player_i
 </ul>
 <h3>O receptador</h3>
 <p>Numa rua ao sul, longe das áreas protegidas, fica <b>Varg</b>. Diga <code>vender</code> e ele compra o equipamento que você saqueou (o seu próprio, não). O equipamento de um personagem vale exatamente <b>10.000</b>, o preço de um <b>Stone Skin Amulet</b> ou de um <b>Might Ring</b>, as únicas coisas que ele vende. O caminho até ele fica fora das áreas protegidas, e quem vai carrega o saque.</p>',
-1, UNIX_TIMESTAMP(), 1, 0, 0, 0, '', '', '', 0);
+1, UNIX_TIMESTAMP(), 1, 0, 0, 0, '', '', '', 0),
+
+('O Dragão de Venore acordou',
+'<p>Venore agora tem um objetivo com hora marcada. A cada 5 minutos o <b>Dragão de Venore</b> desperta no pântano, ao sul do templo, e quem der o último golpe leva uma <b>alma do dragão</b>: +4% de dano contra jogadores, até 3 almas.</p>
+<p>As almas duram 10 minutos e só renovam quando você mata alguém. Quem mata o dono de almas rouba uma e leva 5.000 de ouro por alma. Com 3 almas, a posição do dono é anunciada para todo mundo.</p>
+<p>Quer roubar o dragão de quem está batendo nele? O Varg vende a <b>Runa do Caçador</b> por 5.000: carga única, 1.500 de dano no dragão, a até 2 passos.</p>
+<p>Todos os detalhes estão em <a href="/index.php/rules">Regras</a>.</p>',
+1, UNIX_TIMESTAMP() + 60, 1, 0, 0, 0, '', '', '', 0);
 
 -- ---------------------------------------------------------------- paginas
 
@@ -106,11 +113,20 @@ UPDATE `myaac_pages` SET `title` = 'Regras', `enable_tinymce` = 0, `body` =
 <li>Morrer derruba tudo no corpo: equipamento, mochila e o que houver nela. Você volta ao templo no nível 80, com as skills do começo e um kit novo.</li>
 <li>Sair do jogo também devolve nível, magic level e skills ao 80. Os itens ficam.</li>
 </ul>
+<h3>O Dragão de Venore</h3>
+<ul>
+<li>A cada 5 minutos o <b>Dragão de Venore</b> nasce no pântano, ao sul do templo. Todos recebem um aviso 1 minuto antes. Ele não sai do covil.</li>
+<li>Quem der o <b>último golpe</b> leva uma <b>alma do dragão</b>. Quem causou pelo menos 10% do dano leva 2.000 de ouro.</li>
+<li>Cada alma dá <b>+4% de dano contra jogadores</b>, até 3 almas. Elas somem em 10 minutos, e o prazo só renova quando você mata alguém. Morrer ou sair do jogo apaga as almas.</li>
+<li>Quem tem 3 almas não ganha outra do dragão, e a posição dele é anunciada a todos a cada minuto.</li>
+<li>Quem mata alguém com almas <b>rouba uma</b> e ganha 5.000 de ouro por alma que ele tinha.</li>
+<li><b>Runa do Caçador</b>: o Varg vende por 5.000. Carga única, tira 1.500 do dragão e só alcança 2 passos. É o jeito de roubar o dragão de quem estava batendo nele.</li>
+</ul>
 <h3>Economia</h3>
 <ul>
 <li>O único comerciante é <b>Varg, o receptador</b>, numa rua ao sul, longe das áreas protegidas.</li>
 <li><code>vender</code>: ele compra o equipamento de kit que estiver na sua mochila, desde que não seja o seu.</li>
-<li>O equipamento de um personagem vale exatamente 10.000, o preço de um Stone Skin Amulet ou de um Might Ring (<code>comprar</code>).</li>
+<li>O equipamento de um personagem vale exatamente 10.000, o preço de um Stone Skin Amulet ou de um Might Ring (<code>comprar</code>). Ele também vende a Runa do Caçador, por 5.000.</li>
 <li>Ouro na mochila também cai quando você morre. Guarde no depósito ou no banco o que não quer perder.</li>
 </ul>
 <h3>Convivência</h3>
@@ -130,7 +146,7 @@ UPDATE `myaac_pages` SET `title` = 'Comandos e NPC', `enable_tinymce` = 0, `body
 <tr><th>Diga</th><th>O que acontece</th></tr>
 <tr><td><code>oi</code> ou <code>hi</code></td><td>Começa a conversa.</td></tr>
 <tr><td><code>vender</code></td><td>Vende o equipamento de kit que está na sua mochila. O seu próprio kit ele não compra.</td></tr>
-<tr><td><code>comprar</code> ou <code>trade</code></td><td>Abre a loja: Stone Skin Amulet e Might Ring, 10.000 cada.</td></tr>
+<tr><td><code>comprar</code> ou <code>trade</code></td><td>Abre a loja: Stone Skin Amulet e Might Ring, 10.000 cada; Runa do Caçador, 5.000.</td></tr>
 <tr><td><code>lista</code></td><td>Mostra quanto ele paga por cada peça.</td></tr>
 </table>
 <h3>No chat</h3>

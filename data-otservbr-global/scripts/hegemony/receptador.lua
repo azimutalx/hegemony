@@ -1,7 +1,8 @@
 -- Hegemony PvP: o unico NPC que negocia em Venore.
 --
--- Compra o equipamento dos kits (o saque de quem morreu) e vende so duas
--- coisas: Stone Skin Amulet e Might Ring. O kit de UM personagem vale
+-- Compra o equipamento dos kits (o saque de quem morreu) e vende tres
+-- coisas: Stone Skin Amulet, Might Ring e a Runa do Cacador (para roubar o
+-- Dragao de Venore; ver dragao.lua). O kit de UM personagem vale
 -- exatamente o preco de um dos dois (PRECO), em qualquer um dos cinco kits:
 --
 --   MS/ED       : yalahari mask 1000 + blue robe 1500 + blue legs 1500
@@ -68,10 +69,15 @@ npcConfig.outfit = {
 npcConfig.flags = { floorchange = false, profession = "trader" }
 npcConfig.speechBubble = SPEECHBUBBLE_TRADE
 
+local RUNA = Hegemony.RUNA_DO_CACADOR -- dragao.lua carrega antes (ordem alfabetica)
+
 npcConfig.shop = {
 	{ itemName = "stone skin amulet", clientId = 3081, buy = PRECO },
 	{ itemName = "might ring", clientId = 3048, buy = PRECO },
 }
+if RUNA then
+	table.insert(npcConfig.shop, { itemName = RUNA.nome, clientId = RUNA.id, buy = RUNA.preco })
+end
 
 local keywordHandler = KeywordHandler:new()
 local npcHandler = NpcHandler:new(keywordHandler)
@@ -94,7 +100,36 @@ end
 npcType.onCloseChannel = function(npc, creature)
 	npcHandler:onCloseChannel(npc, creature)
 end
+-- A runa sai com a marca de compra e o nome dela: a runa em branco comum (a
+-- conjurada) nao fere o dragao. Por isso nao passa pelo npc:sellItem.
+local function venderRuna(player, amount, totalCost)
+	if not player:removeMoneyBank(totalCost) then
+		player:sendCancelMessage("Voce nao tem ouro suficiente.")
+		return
+	end
+	local entregues = 0
+	for _ = 1, amount do
+		local item = Game.createItem(RUNA.id, 1)
+		item:setActionId(RUNA.aid)
+		item:setAttribute(ITEM_ATTRIBUTE_NAME, RUNA.nome)
+		item:setAttribute(ITEM_ATTRIBUTE_DESCRIPTION, RUNA.descricao)
+		if player:addItemEx(item) ~= RETURNVALUE_NOERROR then
+			item:remove()
+			break
+		end
+		entregues = entregues + 1
+	end
+	if entregues < amount then
+		player:addMoney((amount - entregues) * RUNA.preco)
+		player:sendCancelMessage("Sem espaco para todas as runas: o troco voltou.")
+	end
+end
+
 npcType.onBuyItem = function(npc, player, itemId, subType, amount, ignore, inBackpacks, totalCost)
+	if RUNA and itemId == RUNA.id then
+		venderRuna(player, amount, totalCost)
+		return
+	end
 	npc:sellItem(player, itemId, amount, subType, 0, ignore, inBackpacks)
 end
 npcType.onSellItem = function(npc, player, itemId, subtype, amount, ignore, name, totalCost) end
@@ -155,7 +190,8 @@ local function creatureSayCallback(npc, creature, type, message)
 		local aviso = proprios > 0 and " O que e teu mesmo ficou contigo." or ""
 		npcHandler:say(string.format("Fechado: %d peca(s) por %d de ouro.%s", #venda, total, aviso), npc, creature)
 	elseif MsgContains(message, "preco") or MsgContains(message, "lista") then
-		npcHandler:say("Pago: " .. tabela() .. ". Vendo {stone skin amulet} e {might ring} por " .. PRECO .. " cada: diga {comprar}.", npc, creature)
+		local runa = RUNA and (", e a {runa do cacador} por " .. RUNA.preco) or ""
+		npcHandler:say("Pago: " .. tabela() .. ". Vendo {stone skin amulet} e {might ring} por " .. PRECO .. " cada" .. runa .. ": diga {comprar}.", npc, creature)
 	end
 	return true
 end

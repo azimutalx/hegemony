@@ -162,7 +162,8 @@ function hegemony_link_personagem(string $nome): string {
 									<li><strong>Morrer</strong>Tudo cai no corpo e você volta ao 80 com kit novo.</li>
 									<li><strong>Sair do jogo</strong>Nível e skills voltam ao 80. Os itens ficam.</li>
 									<li><strong>Suprimentos</strong>Runas, poções, munição e comida infinitas.</li>
-									<li><strong>Varg, o receptador</strong>Compra o equipamento que você saquear e vende Stone Skin e Might Ring por 10.000.</li>
+									<li><strong>Varg, o receptador</strong>Compra o equipamento que você saquear e vende Stone Skin e Might Ring por 10.000 e a Runa do Caçador por 5.000.</li>
+									<li><strong>Dragão de Venore</strong>A cada 5 min no pântano. O último golpe leva uma alma: +4% de dano em jogadores, até 3.</li>
 								</ul>
 							</div>
 						</div>
