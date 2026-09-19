@@ -1,8 +1,0 @@
-host: http://127.0.0.1:8088/login
-client-version: 1525
-loginWebService: http://127.0.0.1:8088/login
-login-url: http://127.0.0.1:8088/login
-painterEngine: 0
-enableShaders: true
-autologin: false
-locale: pt

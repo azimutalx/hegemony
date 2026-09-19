@@ -97,4 +97,4 @@ Because `server` runs the *published* image, local `src/` edits are invisible to
 
 ## Local-only working tree
 
-This checkout also carries untracked, non-upstream directories used for a private deployment: `hegemony-client/` and `otclient-repo/` (OTClient), `client-1525/` (official client assets), `site/` (extra PHP site served by a locally added `site` Compose service), and root-level `init.lua` / `modules/` / `config.otml` OTClient artifacts. None of these belong to Canary upstream — do not treat them as server code, and do not include them in upstream-bound changes.
+This checkout also carries untracked, non-upstream directories used for a private deployment: `client-1525/` (official client assets), `site/` (extra PHP site served by a locally added `site` Compose service), and root-level `init.lua` / `modules/` / `config.otml` OTClient artifacts. None of these belong to Canary upstream — do not treat them as server code, and do not include them in upstream-bound changes. The game client (OTClient C++ plus the Hegemony Lua modules) lives in its own private repository, checked out at `C:\src\hegemony-client`.

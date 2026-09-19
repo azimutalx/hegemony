@@ -12,10 +12,10 @@ documentação do projeto. O README original do Canary continua mais abaixo.
 ## Estado
 
 - **Jogável de ponta a ponta** (protocolo 15.25): login, lista de personagens e entrada no mundo.
-- **O cliente próprio (`hegemony-client/`, sobre o OTClient) ainda não entra no mundo.** Há uma
-  dessincronização de protocolo: o parsing quebra no byte 16.745 de uma mensagem de 22.047 bytes
-  (opcode `0xF0`). Compressão e defasagem de versão já foram descartadas por medição; o próximo
-  passo é instrumentar `protocol.cpp`.
+- **O cliente próprio (sobre o OTClient) entra no mundo desde 18/09/2026** e mora em repositório
+  separado (privado), com o C++ e o Lua juntos, como no OTClient original. A causa da antiga
+  dessincronização de protocolo era o cliente anunciar um sistema operacional que desligava o
+  campo de sequência de 4 bytes do Canary.
 
 ## O que foi feito aqui
 
